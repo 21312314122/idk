@@ -1,8 +1,7 @@
-```json
 {
   "name": "simple-web-proxy",
   "version": "1.0.0",
-  "description": "Simple educational web proxy using Express and Axios",
+  "description": "Simple web proxy",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
