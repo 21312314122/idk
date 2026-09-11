@@ -1,0 +1,220 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Simple Web Proxy</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0f172a;
+      color: white;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: min(900px, 92%);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 44px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #cbd5e1;
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      background: #1e293b;
+      padding: 10px;
+      border-radius: 14px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      outline: none;
+
+      background: transparent;
+      color: white;
+
+      font-size: 18px;
+      padding: 15px;
+    }
+
+    input::placeholder {
+      color: #94a3b8;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 0 25px;
+
+      font-size: 17px;
+      font-weight: bold;
+
+      cursor: pointer;
+      background: #3b82f6;
+      color: white;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    .examples {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .example {
+      color: #60a5fa;
+      cursor: pointer;
+    }
+
+    .loading {
+      display: none;
+      margin-top: 20px;
+      color: #93c5fd;
+    }
+
+    .error {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #7f1d1d;
+      color: #fecaca;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Web Proxy</h1>
+
+    <p>
+      Enter a website URL to retrieve it through the proxy.
+    </p>
+
+    <form
+      id="proxyForm"
+      class="search-box"
+    >
+      <input
+        id="urlInput"
+        type="text"
+        placeholder="https://example.com"
+        autocomplete="off"
+        required
+      >
+
+      <button type="submit">
+        Go
+      </button>
+    </form>
+
+    <div class="examples">
+      Try:
+      <span
+        class="example"
+        data-url="https://example.com"
+      >
+        example.com
+      </span>
+    </div>
+
+    <div
+      id="loading"
+      class="loading"
+    >
+      Loading website...
+    </div>
+
+    <div
+      id="error"
+      class="error"
+    ></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("proxyForm");
+    const input = document.getElementById("urlInput");
+    const loading = document.getElementById("loading");
+    const error = document.getElementById("error");
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+
+      let value = input.value.trim();
+
+      if (!value) {
+        return;
+      }
+
+      /*
+       * Automatically add https:// when the user
+       * enters something like example.com
+       */
+      if (!/^https?:\/\//i.test(value)) {
+        value = "https://" + value;
+      }
+
+      try {
+        const url = new URL(value);
+
+        loading.style.display = "block";
+        error.style.display = "none";
+
+        /*
+         * Navigate directly to the proxy endpoint.
+         */
+        window.location.href =
+          "/proxy?url=" +
+          encodeURIComponent(url.href);
+      } catch {
+        error.textContent = "Please enter a valid URL.";
+        error.style.display = "block";
+        loading.style.display = "none";
+      }
+    });
+
+    /*
+     * Example URL buttons.
+     */
+    document.querySelectorAll(".example").forEach(element => {
+      element.addEventListener("click", () => {
+        input.value = element.dataset.url;
+        form.requestSubmit();
+      });
+    });
+  </script>
+
+</body>
+</html>
+```
