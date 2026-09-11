@@ -1,0 +1,17 @@
+```json
+{
+  "name": "simple-web-proxy",
+  "version": "1.0.0",
+  "description": "Simple educational web proxy using Express and Axios",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.12.0",
+    "cheerio": "^1.1.2",
+    "express": "^5.1.0"
+  }
+}
+```
