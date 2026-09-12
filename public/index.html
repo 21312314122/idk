@@ -8,337 +8,652 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Fast Web Proxy</title>
+  <title>FastProxy Browser</title>
 
   <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #111827;
+      --panel2: #182235;
+      --border: #273449;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --green: #22c55e;
+      --danger: #ef4444;
+      --address: #0a0f1c;
+    }
+
+    body.light {
+      --bg: #eef2f7;
+      --panel: #ffffff;
+      --panel2: #f3f6fa;
+      --border: #d7dee8;
+      --text: #111827;
+      --muted: #64748b;
+      --accent: #4f46e5;
+      --accent2: #7c3aed;
+      --green: #16a34a;
+      --danger: #dc2626;
+      --address: #f8fafc;
+    }
+
     * {
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
-      min-height: 100vh;
-
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       font-family:
         Inter,
-        Arial,
-        Helvetica,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-      background:
-        radial-gradient(
-          circle at top left,
-          #1d4ed8 0%,
-          transparent 35%
-        ),
-        radial-gradient(
-          circle at bottom right,
-          #7c3aed 0%,
-          transparent 35%
-        ),
-        #020617;
+    button,
+    input {
+      font: inherit;
+    }
 
+    button {
+      border: 0;
+    }
+
+    .browser {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+
+    /* =========================
+       TOP BAR
+    ========================= */
+
+    .top {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .window-row {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 12px;
+    }
+
+    .traffic {
+      display: flex;
+      gap: 7px;
+      margin-right: 5px;
+    }
+
+    .traffic span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: block;
+      background: #64748b;
+    }
+
+    .traffic span:nth-child(1) {
+      background: #ef4444;
+    }
+
+    .traffic span:nth-child(2) {
+      background: #f59e0b;
+    }
+
+    .traffic span:nth-child(3) {
+      background: #22c55e;
+    }
+
+    .brand {
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 9px rgba(34, 197, 94, .65);
+    }
+
+    /* =========================
+       TABS
+    ========================= */
+
+    .tabs {
+      min-height: 43px;
+      display: flex;
+      align-items: end;
+      gap: 5px;
+      padding: 0 9px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      background: var(--panel);
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab {
+      height: 38px;
+      min-width: 150px;
+      max-width: 240px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      border-radius: 10px 10px 0 0;
+      background: var(--panel2);
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      border: 1px solid transparent;
+      border-bottom: 0;
+    }
+
+    .tab.active {
+      background: var(--bg);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .tab-title {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 13px;
+    }
+
+    .tab-close {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .tab-close:hover {
+      background: rgba(148, 163, 184, .15);
+      color: var(--text);
+    }
+
+    .new-tab {
+      width: 34px;
+      height: 34px;
+      margin-bottom: 2px;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 22px;
+    }
+
+    .new-tab:hover {
+      background: var(--panel2);
+      color: var(--text);
+    }
+
+    /* =========================
+       NAVIGATION
+    ========================= */
+
+    .nav-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .nav-btn {
+      width: 38px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--panel2);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .nav-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    .nav-btn:disabled {
+      opacity: .35;
+      cursor: default;
+    }
+
+    .address-wrap {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+    }
+
+    .address {
+      width: 100%;
+      height: 38px;
+      padding: 0 45px 0 43px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      outline: none;
+      background: var(--address);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .address:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    }
+
+    .lock {
+      position: absolute;
+      left: 16px;
+      top: 10px;
+      font-size: 14px;
+      opacity: .7;
+    }
+
+    .go {
+      position: absolute;
+      right: 5px;
+      top: 4px;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 15px;
+      background: var(--accent);
       color: white;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12px;
+    }
 
+    .go:hover {
+      filter: brightness(1.1);
+    }
+
+    .tool-btn {
+      width: 38px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--panel2);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 17px;
+    }
+
+    .tool-btn:hover {
+      background: var(--border);
+    }
+
+    /* =========================
+       INFO BAR
+    ========================= */
+
+    .info-bar {
+      height: 27px;
+      display: flex;
+      align-items: center;
+      gap: 17px;
+      padding: 0 14px;
+      font-size: 11px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .info-value {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* =========================
+       CONTENT
+    ========================= */
+
+    .content {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      background: var(--bg);
+    }
+
+    .tab-page {
+      position: absolute;
+      inset: 0;
+      display: none;
+    }
+
+    .tab-page.active {
+      display: block;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: white;
+    }
+
+    /* =========================
+       HOME
+    ========================= */
+
+    .home {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
       display: flex;
       justify-content: center;
-      align-items: center;
-
-      padding: 24px;
+      align-items: flex-start;
+      padding: 70px 22px;
     }
 
-    .container {
-      width: 100%;
-      max-width: 850px;
+    .home-inner {
+      width: min(100%, 950px);
+      text-align: center;
     }
 
-    .card {
-      background: rgba(15, 23, 42, 0.84);
-
-      border: 1px solid rgba(255, 255, 255, 0.1);
-
-      backdrop-filter: blur(20px);
-
-      border-radius: 24px;
-
-      padding: 42px;
-
+    .logo {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      background:
+        linear-gradient(
+          135deg,
+          var(--accent),
+          var(--accent2)
+        );
+      font-size: 32px;
       box-shadow:
-        0 25px 80px rgba(0, 0, 0, 0.45);
+        0 20px 40px rgba(79, 70, 229, .22);
     }
 
-    .badge {
-      display: inline-flex;
-
-      align-items: center;
-
-      gap: 8px;
-
-      padding: 8px 12px;
-
-      border-radius: 999px;
-
-      background: rgba(59, 130, 246, 0.15);
-
-      border: 1px solid rgba(96, 165, 250, 0.2);
-
-      color: #93c5fd;
-
-      font-size: 13px;
-
-      font-weight: 700;
-
-      margin-bottom: 18px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-
-      border-radius: 50%;
-
-      background: #4ade80;
-
-      box-shadow:
-        0 0 12px rgba(74, 222, 128, 0.8);
-    }
-
-    h1 {
+    .home h1 {
       margin: 0;
-
-      font-size: clamp(42px, 8vw, 72px);
-
-      line-height: 0.95;
-
-      letter-spacing: -3px;
+      font-size: clamp(38px, 6vw, 64px);
+      letter-spacing: -2.5px;
     }
 
-    .gradient {
+    .home h1 span {
       background:
         linear-gradient(
           90deg,
           #60a5fa,
-          #a78bfa,
-          #f472b6
+          #8b5cf6,
+          #ec4899
         );
-
       -webkit-background-clip: text;
       background-clip: text;
-
       color: transparent;
     }
 
-    .subtitle {
-      margin: 20px 0 30px;
-
-      color: #94a3b8;
-
-      font-size: 17px;
-
+    .home p {
+      max-width: 650px;
+      margin: 15px auto 30px;
+      color: var(--muted);
       line-height: 1.6;
     }
 
-    .search {
+    .home-search {
       display: flex;
-
       gap: 10px;
-
-      padding: 8px;
-
-      background: #0f172a;
-
-      border: 1px solid #334155;
-
-      border-radius: 16px;
+      width: min(760px, 100%);
+      margin: 0 auto;
     }
 
-    .search input {
+    .home-search input {
       flex: 1;
-
       min-width: 0;
-
-      border: none;
-
+      height: 54px;
+      padding: 0 18px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
       outline: none;
-
-      background: transparent;
-
-      color: white;
-
-      font-size: 17px;
-
-      padding: 16px;
-    }
-
-    .search input::placeholder {
-      color: #64748b;
-    }
-
-    .search button {
-      border: none;
-
-      border-radius: 12px;
-
-      padding: 0 24px;
-
+      background: var(--panel);
+      color: var(--text);
       font-size: 16px;
+    }
 
-      font-weight: 800;
-
-      cursor: pointer;
-
-      color: white;
-
+    .home-search button {
+      height: 54px;
+      padding: 0 26px;
+      border-radius: 15px;
       background:
         linear-gradient(
           135deg,
-          #2563eb,
-          #7c3aed
+          var(--accent),
+          var(--accent2)
         );
-
-      transition:
-        transform 0.15s ease,
-        opacity 0.15s ease;
-    }
-
-    .search button:hover {
-      transform: translateY(-1px);
-      opacity: 0.92;
-    }
-
-    .search button:active {
-      transform: translateY(0);
-    }
-
-    .examples {
-      margin-top: 22px;
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 10px;
-
-      flex-wrap: wrap;
-
-      color: #64748b;
-
-      font-size: 14px;
-    }
-
-    .example {
-      border: 1px solid #334155;
-
-      background: #111827;
-
-      color: #cbd5e1;
-
-      padding: 8px 11px;
-
-      border-radius: 10px;
-
-      cursor: pointer;
-
-      transition: 0.15s ease;
-    }
-
-    .example:hover {
-      border-color: #60a5fa;
       color: white;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-    .status {
-      display: none;
-
-      margin-top: 20px;
-
-      padding: 13px 15px;
-
-      border-radius: 12px;
-
-      font-size: 14px;
+    .quick-title {
+      margin-top: 38px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    .loading {
-      background: rgba(37, 99, 235, 0.12);
-
-      border: 1px solid rgba(96, 165, 250, 0.18);
-
-      color: #93c5fd;
-    }
-
-    .error {
-      background: rgba(127, 29, 29, 0.25);
-
-      border: 1px solid rgba(248, 113, 113, 0.2);
-
-      color: #fca5a5;
-    }
-
-    .info {
-      margin-top: 30px;
-
+    .quick-grid {
       display: grid;
-
       grid-template-columns:
-        repeat(3, 1fr);
-
+        repeat(auto-fit, minmax(145px, 1fr));
       gap: 12px;
     }
 
-    .info-box {
+    .quick-card {
+      text-align: left;
       padding: 17px;
-
-      border-radius: 14px;
-
-      background: rgba(30, 41, 59, 0.55);
-
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 15px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform .15s ease;
     }
 
-    .info-title {
-      font-size: 12px;
-
-      color: #64748b;
-
-      text-transform: uppercase;
-
-      letter-spacing: 1px;
-
-      margin-bottom: 7px;
+    .quick-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
     }
 
-    .info-value {
-      font-weight: 700;
-
-      color: #e2e8f0;
+    .quick-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
     }
 
-    .footer {
+    .quick-name {
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .quick-url {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* =========================
+       LOADING
+    ========================= */
+
+    .loading-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      background:
+        radial-gradient(
+          circle at center,
+          rgba(30, 41, 59, .97),
+          rgba(2, 6, 23, .99)
+        );
+      color: white;
+    }
+
+    .loading-screen.show {
+      display: grid;
+    }
+
+    .loading-box {
+      width: min(400px, 88%);
       text-align: center;
-
-      margin-top: 20px;
-
-      color: #475569;
-
-      font-size: 13px;
     }
 
-    @media (max-width: 700px) {
-      .card {
-        padding: 28px;
+    .spinner {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,.12);
+      border-top-color: #8b5cf6;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-title {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .loading-url {
+      margin-top: 8px;
+      color: #94a3b8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .loading-bar {
+      height: 5px;
+      margin-top: 22px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+    }
+
+    .loading-progress {
+      width: 35%;
+      height: 100%;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          90deg,
+          #60a5fa,
+          #8b5cf6,
+          #ec4899
+        );
+      animation: progress 1.4s ease-in-out infinite;
+    }
+
+    @keyframes progress {
+      0% {
+        transform: translateX(-130%);
       }
 
-      .search {
+      100% {
+        transform: translateX(380%);
+      }
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 700px) {
+      .brand,
+      .status {
+        display: none;
+      }
+
+      .nav-row {
+        gap: 5px;
+      }
+
+      .nav-btn,
+      .tool-btn {
+        width: 34px;
+      }
+
+      .home {
+        padding-top: 45px;
+      }
+
+      .home-search {
         flex-direction: column;
       }
 
-      .search button {
-        height: 52px;
+      .home-search button {
+        width: 100%;
       }
 
-      .info {
-        grid-template-columns: 1fr;
+      .info-bar {
+        gap: 10px;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .tab {
+        min-width: 130px;
       }
     }
   </style>
@@ -346,272 +661,1544 @@
 
 <body>
 
-  <main class="container">
+<div class="browser">
 
-    <section class="card">
+  <!-- =====================
+       TOP
+  ====================== -->
 
-      <div class="badge">
-        <span class="dot"></span>
-        Fast Proxy Online
+  <div class="top">
+
+    <div class="window-row">
+
+      <div class="traffic">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
 
-      <h1>
-        Browse <span class="gradient">Faster.</span>
-      </h1>
-
-      <p class="subtitle">
-        Enter a website address and load it through your
-        proxy server.
-      </p>
-
-      <form id="proxyForm" class="search">
-
-        <input
-          id="urlInput"
-          type="text"
-          placeholder="https://example.com"
-          autocomplete="off"
-          spellcheck="false"
-          required
-        >
-
-        <button type="submit">
-          Go →
-        </button>
-
-      </form>
-
-      <div class="examples">
-        <span>Try:</span>
-
-        <button
-          class="example"
-          type="button"
-          data-url="https://example.com"
-        >
-          Example
-        </button>
-
-        <button
-          class="example"
-          type="button"
-          data-url="https://www.wikipedia.org"
-        >
-          Wikipedia
-        </button>
-
-        <button
-          class="example"
-          type="button"
-          data-url="https://www.poki.com"
-        >
-          Poki
-        </button>
+      <div class="brand">
+        ⚡ FastProxy
       </div>
 
-      <div
-        id="loading"
-        class="status loading"
-      >
-        Loading website through proxy...
+      <div class="status">
+        <span class="status-dot"></span>
+        Proxy online
       </div>
 
-      <div
-        id="error"
-        class="status error"
-      ></div>
-
-      <div class="info">
-
-        <div class="info-box">
-          <div class="info-title">
-            Connection
-          </div>
-
-          <div class="info-value">
-            Render Backend
-          </div>
-        </div>
-
-        <div class="info-box">
-          <div class="info-title">
-            Resources
-          </div>
-
-          <div class="info-value">
-            Direct CDN Loading
-          </div>
-        </div>
-
-        <div class="info-box">
-          <div class="info-title">
-            Cache
-          </div>
-
-          <div class="info-value">
-            Enabled
-          </div>
-        </div>
-
-      </div>
-
-    </section>
-
-    <div class="footer">
-      Fast Web Proxy
     </div>
 
-  </main>
+    <!-- TABS -->
 
-  <script>
+    <div
+      id="tabs"
+      class="tabs"
+    ></div>
 
-    /*
-     * IMPORTANT:
-     *
-     * This is your Render backend.
-     */
-    const PROXY_SERVER =
-      "https://idk-3-89oq.onrender.com";
+    <!-- NAVIGATION -->
+
+    <div class="nav-row">
+
+      <button
+        class="nav-btn"
+        id="backBtn"
+        title="Back"
+      >
+        ←
+      </button>
+
+      <button
+        class="nav-btn"
+        id="forwardBtn"
+        title="Forward"
+      >
+        →
+      </button>
+
+      <button
+        class="nav-btn"
+        id="reloadBtn"
+        title="Reload"
+      >
+        ⟳
+      </button>
+
+      <button
+        class="nav-btn"
+        id="homeBtn"
+        title="Home"
+      >
+        ⌂
+      </button>
+
+      <div class="address-wrap">
+
+        <span class="lock">
+          🔒
+        </span>
+
+        <input
+          id="address"
+          class="address"
+          type="text"
+          placeholder="Search or enter website"
+          spellcheck="false"
+          autocomplete="off"
+        >
+
+        <button
+          id="goBtn"
+          class="go"
+        >
+          Go
+        </button>
+
+      </div>
+
+      <button
+        id="themeBtn"
+        class="tool-btn"
+        title="Day / Night"
+      >
+        ☀️
+      </button>
+
+      <button
+        id="starBtn"
+        class="tool-btn"
+        title="Bookmark"
+      >
+        ☆
+      </button>
+
+    </div>
+
+    <!-- INFO -->
+
+    <div class="info-bar">
+
+      <div class="info-item">
+        ⚡ Speed:
+        <span
+          id="speedValue"
+          class="info-value"
+        >
+          —
+        </span>
+      </div>
+
+      <div class="info-item">
+        🧠 Cache:
+        <span
+          id="cacheValue"
+          class="info-value"
+        >
+          Ready
+        </span>
+      </div>
+
+      <div class="info-item">
+        🌐 Status:
+        <span
+          id="pageStatus"
+          class="info-value"
+        >
+          Home
+        </span>
+      </div>
+
+    </div>
+
+  </div>
 
 
-    const form =
-      document.getElementById("proxyForm");
+  <!-- =====================
+       CONTENT
+  ====================== -->
 
-    const input =
-      document.getElementById("urlInput");
-
-    const loading =
-      document.getElementById("loading");
-
-    const error =
-      document.getElementById("error");
+  <main
+    id="content"
+    class="content"
+  ></main>
 
 
-    function showLoading() {
+  <!-- =====================
+       LOADING SCREEN
+  ====================== -->
 
-      loading.style.display = "block";
+  <div
+    id="loadingScreen"
+    class="loading-screen"
+  >
 
-      error.style.display = "none";
+    <div class="loading-box">
+
+      <div class="spinner"></div>
+
+      <div class="loading-title">
+        Loading website
+      </div>
+
+      <div
+        id="loadingUrl"
+        class="loading-url"
+      >
+        Connecting...
+      </div>
+
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  /*
+   * ========================================
+   * CONFIG
+   * ========================================
+   */
+
+  const PROXY_SERVER =
+    "https://idk-3-89oq.onrender.com";
+
+
+  /*
+   * ========================================
+   * STATE
+   * ========================================
+   */
+
+  let tabs = [];
+
+  let activeTabId = null;
+
+  let nextTabId = 1;
+
+
+  /*
+   * ========================================
+   * ELEMENTS
+   * ========================================
+   */
+
+  const tabsElement =
+    document.getElementById("tabs");
+
+  const contentElement =
+    document.getElementById("content");
+
+  const addressElement =
+    document.getElementById("address");
+
+  const loadingScreen =
+    document.getElementById("loadingScreen");
+
+  const loadingUrl =
+    document.getElementById("loadingUrl");
+
+  const speedValue =
+    document.getElementById("speedValue");
+
+  const cacheValue =
+    document.getElementById("cacheValue");
+
+  const pageStatus =
+    document.getElementById("pageStatus");
+
+  const backBtn =
+    document.getElementById("backBtn");
+
+  const forwardBtn =
+    document.getElementById("forwardBtn");
+
+  const reloadBtn =
+    document.getElementById("reloadBtn");
+
+  const homeBtn =
+    document.getElementById("homeBtn");
+
+  const themeBtn =
+    document.getElementById("themeBtn");
+
+  const starBtn =
+    document.getElementById("starBtn");
+
+  const goBtn =
+    document.getElementById("goBtn");
+
+
+  /*
+   * ========================================
+   * HOME PAGE
+   * ========================================
+   */
+
+  function homeHTML() {
+
+    return `
+      <div class="home">
+
+        <div class="home-inner">
+
+          <div class="logo">
+            ⚡
+          </div>
+
+          <h1>
+            Fast<span>Proxy</span>
+          </h1>
+
+          <p>
+            A lightweight browser-style proxy
+            with tabs, caching, speed tracking,
+            dark mode and quick access.
+          </p>
+
+          <div class="home-search">
+
+            <input
+              id="homeInput"
+              placeholder="Enter a website..."
+              autocomplete="off"
+              spellcheck="false"
+            >
+
+            <button id="homeGo">
+              Browse →
+            </button>
+
+          </div>
+
+          <div class="quick-title">
+            Quick launch
+          </div>
+
+          <div class="quick-grid">
+
+            <button
+              class="quick-card"
+              data-url="https://example.com"
+            >
+              <div class="quick-icon">
+                🌐
+              </div>
+
+              <div class="quick-name">
+                Example
+              </div>
+
+              <div class="quick-url">
+                example.com
+              </div>
+            </button>
+
+
+            <button
+              class="quick-card"
+              data-url="https://www.wikipedia.org"
+            >
+              <div class="quick-icon">
+                📚
+              </div>
+
+              <div class="quick-name">
+                Wikipedia
+              </div>
+
+              <div class="quick-url">
+                wikipedia.org
+              </div>
+            </button>
+
+
+            <button
+              class="quick-card"
+              data-url="https://www.poki.com"
+            >
+              <div class="quick-icon">
+                🎮
+              </div>
+
+              <div class="quick-name">
+                Poki
+              </div>
+
+              <div class="quick-url">
+                poki.com
+              </div>
+            </button>
+
+
+            <button
+              class="quick-card"
+              data-url="https://www.google.com"
+            >
+              <div class="quick-icon">
+                🔎
+              </div>
+
+              <div class="quick-name">
+                Google
+              </div>
+
+              <div class="quick-url">
+                google.com
+              </div>
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    `;
+  }
+
+
+  /*
+   * ========================================
+   * CREATE TAB
+   * ========================================
+   */
+
+  function createTab(url = null) {
+
+    const id =
+      nextTabId++;
+
+    const page =
+      document.createElement("div");
+
+    page.className =
+      "tab-page";
+
+    page.dataset.id =
+      id;
+
+
+    if (url) {
+
+      const iframe =
+        createIframe(url, id);
+
+      page.appendChild(iframe);
+
+    } else {
+
+      page.innerHTML =
+        homeHTML();
 
     }
 
 
-    function showError(message) {
+    contentElement.appendChild(page);
 
-      error.textContent = message;
 
-      error.style.display = "block";
+    const tab = {
 
-      loading.style.display = "none";
+      id,
+
+      title:
+        url
+          ? getDomain(url)
+          : "New Tab",
+
+      url:
+        url || null,
+
+      history:
+        url ? [url] : [],
+
+      historyIndex:
+        url ? 0 : -1,
+
+      page,
+
+      startTime:
+        null,
+
+      iframe:
+        null
+
+    };
+
+
+    if (url) {
+      tab.iframe =
+        page.querySelector("iframe");
+    }
+
+
+    tabs.push(tab);
+
+    renderTabs();
+
+    switchTab(id);
+
+    attachHomeEvents(page);
+
+    return tab;
+  }
+
+
+  /*
+   * ========================================
+   * CREATE IFRAME
+   * ========================================
+   */
+
+  function createIframe(url, tabId) {
+
+    const iframe =
+      document.createElement("iframe");
+
+    iframe.src =
+      buildProxyUrl(url);
+
+    iframe.dataset.url =
+      url;
+
+    iframe.loading =
+      "eager";
+
+    const tab =
+      tabs.find(t => t.id === tabId);
+
+    if (tab) {
+
+      tab.startTime =
+        performance.now();
 
     }
 
 
-    form.addEventListener(
-      "submit",
-      event => {
+    iframe.addEventListener(
+      "load",
+      () => {
 
-        event.preventDefault();
+        const currentTab =
+          tabs.find(t => t.id === tabId);
 
-        let value =
-          input.value.trim();
-
-
-        if (!value) {
+        if (!currentTab) {
           return;
         }
 
 
-        /*
-         * Add HTTPS when the user
-         * enters example.com instead
-         * of https://example.com
-         */
-        if (
-          !/^https?:\/\//i.test(value)
-        ) {
-
-          value =
-            "https://" + value;
-
-        }
+        const elapsed =
+          performance.now() -
+          (currentTab.startTime ||
+           performance.now());
 
 
-        try {
+        updateSpeed(elapsed);
 
-          const target =
-            new URL(value);
+        loadingScreen.classList.remove(
+          "show"
+        );
 
+        cacheValue.textContent =
+          elapsed < 1000
+            ? "Fast"
+            : "Smart";
 
-          if (
-            target.protocol !== "http:" &&
-            target.protocol !== "https:"
-          ) {
-
-            showError(
-              "Please enter an HTTP or HTTPS website."
-            );
-
-            return;
-
-          }
-
-
-          showLoading();
-
-
-          /*
-           * Send the request to Render.
-           *
-           * This is the important part
-           * that connects your GitHub Pages
-           * frontend to the Node server.
-           */
-          const destination =
-            PROXY_SERVER +
-            "/proxy?url=" +
-            encodeURIComponent(
-              target.href
-            );
-
-
-          window.location.href =
-            destination;
-
-        } catch {
-
-          showError(
-            "Please enter a valid website URL."
-          );
-
-        }
-
+        pageStatus.textContent =
+          "Loaded";
       }
     );
 
 
-    /*
-     * Example buttons.
-     */
-    document
-      .querySelectorAll(".example")
-      .forEach(button => {
+    iframe.addEventListener(
+      "error",
+      () => {
 
-        button.addEventListener(
+        loadingScreen.classList.remove(
+          "show"
+        );
+
+        pageStatus.textContent =
+          "Error";
+      }
+    );
+
+
+    return iframe;
+  }
+
+
+  /*
+   * ========================================
+   * PROXY URL
+   * ========================================
+   */
+
+  function buildProxyUrl(url) {
+
+    return (
+      PROXY_SERVER +
+      "/proxy?url=" +
+      encodeURIComponent(url)
+    );
+
+  }
+
+
+  /*
+   * ========================================
+   * NAVIGATE
+   * ========================================
+   */
+
+  function navigate(rawUrl) {
+
+    let url =
+      rawUrl.trim();
+
+    if (!url) {
+      return;
+    }
+
+
+    if (
+      !/^https?:\/\//i.test(url)
+    ) {
+
+      url =
+        "https://" + url;
+
+    }
+
+
+    try {
+
+      const parsed =
+        new URL(url);
+
+      url =
+        parsed.href;
+
+    } catch {
+
+      pageStatus.textContent =
+        "Invalid URL";
+
+      return;
+    }
+
+
+    const tab =
+      tabs.find(
+        t => t.id === activeTabId
+      );
+
+    if (!tab) {
+      return;
+    }
+
+
+    showLoading(url);
+
+
+    const iframe =
+      createIframe(
+        url,
+        tab.id
+      );
+
+
+    tab.page.innerHTML =
+      "";
+
+    tab.page.appendChild(
+      iframe
+    );
+
+    tab.iframe =
+      iframe;
+
+    tab.url =
+      url;
+
+    tab.title =
+      getDomain(url);
+
+
+    /*
+     * History.
+     */
+
+    if (
+      tab.history[
+        tab.history.length - 1
+      ] !== url
+    ) {
+
+      tab.history =
+        tab.history.slice(
+          0,
+          tab.historyIndex + 1
+        );
+
+      tab.history.push(url);
+
+      tab.historyIndex =
+        tab.history.length - 1;
+
+    }
+
+
+    renderTabs();
+
+    updateAddress();
+
+    updateNavigation();
+
+  }
+
+
+  /*
+   * ========================================
+   * SHOW LOADING
+   * ========================================
+   */
+
+  function showLoading(url) {
+
+    loadingUrl.textContent =
+      url;
+
+    loadingScreen.classList.add(
+      "show"
+    );
+
+    pageStatus.textContent =
+      "Loading";
+
+    speedValue.textContent =
+      "Loading...";
+  }
+
+
+  /*
+   * ========================================
+   * SPEED
+   * ========================================
+   */
+
+  function updateSpeed(ms) {
+
+    if (ms < 1000) {
+
+      speedValue.textContent =
+        Math.round(ms) + " ms";
+
+    } else {
+
+      speedValue.textContent =
+        (ms / 1000).toFixed(2) +
+        " s";
+    }
+
+  }
+
+
+  /*
+   * ========================================
+   * TAB SWITCH
+   * ========================================
+   */
+
+  function switchTab(id) {
+
+    activeTabId =
+      id;
+
+
+    tabs.forEach(tab => {
+
+      tab.page.classList.toggle(
+        "active",
+        tab.id === id
+      );
+
+    });
+
+
+    renderTabs();
+
+    updateAddress();
+
+    updateNavigation();
+
+
+    const tab =
+      tabs.find(
+        t => t.id === id
+      );
+
+
+    if (tab && tab.url) {
+
+      pageStatus.textContent =
+        "Ready";
+
+    } else {
+
+      pageStatus.textContent =
+        "Home";
+
+    }
+
+  }
+
+
+  /*
+   * ========================================
+   * RENDER TABS
+   * ========================================
+   */
+
+  function renderTabs() {
+
+    tabsElement.innerHTML =
+      "";
+
+
+    tabs.forEach(tab => {
+
+      const button =
+        document.createElement("div");
+
+      button.className =
+        "tab" +
+        (
+          tab.id === activeTabId
+            ? " active"
+            : ""
+        );
+
+
+      const title =
+        document.createElement("div");
+
+      title.className =
+        "tab-title";
+
+      title.textContent =
+        tab.title;
+
+
+      const close =
+        document.createElement("button");
+
+      close.className =
+        "tab-close";
+
+      close.textContent =
+        "×";
+
+
+      close.addEventListener(
+        "click",
+        event => {
+
+          event.stopPropagation();
+
+          closeTab(tab.id);
+
+        }
+      );
+
+
+      button.appendChild(
+        title
+      );
+
+      button.appendChild(
+        close
+      );
+
+
+      button.addEventListener(
+        "click",
+        () => {
+          switchTab(tab.id);
+        }
+      );
+
+
+      tabsElement.appendChild(
+        button
+      );
+
+    });
+
+
+    const plus =
+      document.createElement("button");
+
+    plus.className =
+      "new-tab";
+
+    plus.textContent =
+      "+";
+
+    plus.title =
+      "New tab";
+
+
+    plus.addEventListener(
+      "click",
+      () => {
+        createTab();
+      }
+    );
+
+
+    tabsElement.appendChild(
+      plus
+    );
+
+  }
+
+
+  /*
+   * ========================================
+   * CLOSE TAB
+   * ========================================
+   */
+
+  function closeTab(id) {
+
+    const index =
+      tabs.findIndex(
+        t => t.id === id
+      );
+
+
+    if (index === -1) {
+      return;
+    }
+
+
+    const tab =
+      tabs[index];
+
+
+    tab.page.remove();
+
+    tabs.splice(
+      index,
+      1
+    );
+
+
+    if (
+      activeTabId === id
+    ) {
+
+      if (tabs.length === 0) {
+
+        createTab();
+
+      } else {
+
+        const newIndex =
+          Math.max(
+            0,
+            index - 1
+          );
+
+        switchTab(
+          tabs[newIndex].id
+        );
+
+      }
+
+    }
+
+
+    renderTabs();
+
+  }
+
+
+  /*
+   * ========================================
+   * ADDRESS BAR
+   * ========================================
+   */
+
+  function updateAddress() {
+
+    const tab =
+      tabs.find(
+        t => t.id === activeTabId
+      );
+
+
+    addressElement.value =
+      tab && tab.url
+        ? tab.url
+        : "";
+
+  }
+
+
+  /*
+   * ========================================
+   * BACK
+   * ========================================
+   */
+
+  function goBack() {
+
+    const tab =
+      tabs.find(
+        t => t.id === activeTabId
+      );
+
+
+    if (!tab) {
+      return;
+    }
+
+
+    if (
+      tab.historyIndex <= 0
+    ) {
+      return;
+    }
+
+
+    tab.historyIndex--;
+
+    const url =
+      tab.history[
+        tab.historyIndex
+      ];
+
+
+    loadHistoryUrl(
+      tab,
+      url
+    );
+
+  }
+
+
+  /*
+   * ========================================
+   * FORWARD
+   * ========================================
+   */
+
+  function goForward() {
+
+    const tab =
+      tabs.find(
+        t => t.id === activeTabId
+      );
+
+
+    if (!tab) {
+      return;
+    }
+
+
+    if (
+      tab.historyIndex >=
+      tab.history.length - 1
+    ) {
+      return;
+    }
+
+
+    tab.historyIndex++;
+
+    const url =
+      tab.history[
+        tab.historyIndex
+      ];
+
+
+    loadHistoryUrl(
+      tab,
+      url
+    );
+
+  }
+
+
+  /*
+   * ========================================
+   * LOAD HISTORY
+   * ========================================
+   */
+
+  function loadHistoryUrl(
+    tab,
+    url
+  ) {
+
+    showLoading(url);
+
+
+    const iframe =
+      createIframe(
+        url,
+        tab.id
+      );
+
+
+    tab.page.innerHTML =
+      "";
+
+    tab.page.appendChild(
+      iframe
+    );
+
+    tab.iframe =
+      iframe;
+
+    tab.url =
+      url;
+
+    tab.title =
+      getDomain(url);
+
+
+    renderTabs();
+
+    updateAddress();
+
+    updateNavigation();
+
+  }
+
+
+  /*
+   * ========================================
+   * RELOAD
+   * ========================================
+   */
+
+  function reloadPage() {
+
+    const tab =
+      tabs.find(
+        t => t.id === activeTabId
+      );
+
+
+    if (!tab) {
+      return;
+    }
+
+
+    if (!tab.url) {
+      return;
+    }
+
+
+    showLoading(tab.url);
+
+
+    tab.startTime =
+      performance.now();
+
+
+    if (tab.iframe) {
+
+      tab.iframe.src =
+        buildProxyUrl(
+          tab.url
+        );
+
+    }
+
+  }
+
+
+  /*
+   * ========================================
+   * HOME
+   * ========================================
+   */
+
+  function goHome() {
+
+    const tab =
+      tabs.find(
+        t => t.id === activeTabId
+      );
+
+
+    if (!tab) {
+      return;
+    }
+
+
+    tab.url =
+      null;
+
+    tab.title =
+      "New Tab";
+
+    tab.history =
+      [];
+
+    tab.historyIndex =
+      -1;
+
+
+    tab.page.innerHTML =
+      homeHTML();
+
+
+    tab.iframe =
+      null;
+
+
+    attachHomeEvents(
+      tab.page
+    );
+
+
+    renderTabs();
+
+    updateAddress();
+
+    updateNavigation();
+
+
+    pageStatus.textContent =
+      "Home";
+
+    speedValue.textContent =
+      "—";
+
+    cacheValue.textContent =
+      "Ready";
+
+  }
+
+
+  /*
+   * ========================================
+   * NAV BUTTONS
+   * ========================================
+   */
+
+  function updateNavigation() {
+
+    const tab =
+      tabs.find(
+        t => t.id === activeTabId
+      );
+
+
+    if (!tab) {
+      return;
+    }
+
+
+    backBtn.disabled =
+      tab.historyIndex <= 0;
+
+
+    forwardBtn.disabled =
+      tab.historyIndex >=
+      tab.history.length - 1 ||
+      tab.history.length === 0;
+
+  }
+
+
+  /*
+   * ========================================
+   * DOMAIN
+   * ========================================
+   */
+
+  function getDomain(url) {
+
+    try {
+
+      return new URL(url)
+        .hostname
+        .replace(/^www\./, "");
+
+    } catch {
+
+      return "New Tab";
+
+    }
+
+  }
+
+
+  /*
+   * ========================================
+   * HOME EVENTS
+   * ========================================
+   */
+
+  function attachHomeEvents(page) {
+
+    const input =
+      page.querySelector(
+        "#homeInput"
+      );
+
+    const button =
+      page.querySelector(
+        "#homeGo"
+      );
+
+
+    if (input && button) {
+
+      button.addEventListener(
+        "click",
+        () => {
+          navigate(
+            input.value
+          );
+        }
+      );
+
+
+      input.addEventListener(
+        "keydown",
+        event => {
+
+          if (
+            event.key === "Enter"
+          ) {
+
+            navigate(
+              input.value
+            );
+
+          }
+
+        }
+      );
+
+    }
+
+
+    page
+      .querySelectorAll(
+        ".quick-card"
+      )
+      .forEach(card => {
+
+        card.addEventListener(
           "click",
           () => {
 
-            input.value =
-              button.dataset.url;
-
-            form.requestSubmit();
+            navigate(
+              card.dataset.url
+            );
 
           }
         );
 
       });
 
-  </script>
+  }
+
+
+  /*
+   * ========================================
+   * THEME
+   * ========================================
+   */
+
+  function loadTheme() {
+
+    const saved =
+      localStorage.getItem(
+        "fastproxy-theme"
+      );
+
+
+    if (saved === "light") {
+
+      document.body.classList.add(
+        "light"
+      );
+
+      themeBtn.textContent =
+        "🌙";
+
+    } else {
+
+      themeBtn.textContent =
+        "☀️";
+
+    }
+
+  }
+
+
+  themeBtn.addEventListener(
+    "click",
+    () => {
+
+      const light =
+        document.body.classList.toggle(
+          "light"
+        );
+
+
+      localStorage.setItem(
+        "fastproxy-theme",
+        light
+          ? "light"
+          : "dark"
+      );
+
+
+      themeBtn.textContent =
+        light
+          ? "🌙"
+          : "☀️";
+
+    }
+  );
+
+
+  /*
+   * ========================================
+   * BOOKMARK
+   * ========================================
+   */
+
+  starBtn.addEventListener(
+    "click",
+    () => {
+
+      const tab =
+        tabs.find(
+          t => t.id === activeTabId
+        );
+
+
+      if (!tab || !tab.url) {
+        return;
+      }
+
+
+      const bookmarks =
+        JSON.parse(
+          localStorage.getItem(
+            "fastproxy-bookmarks"
+          ) || "[]"
+        );
+
+
+      if (
+        !bookmarks.includes(tab.url)
+      ) {
+
+        bookmarks.push(
+          tab.url
+        );
+
+        localStorage.setItem(
+          "fastproxy-bookmarks",
+          JSON.stringify(
+            bookmarks
+          )
+        );
+
+        starBtn.textContent =
+          "★";
+
+      }
+
+    }
+  );
+
+
+  /*
+   * ========================================
+   * EVENTS
+   * ========================================
+   */
+
+  goBtn.addEventListener(
+    "click",
+    () => {
+      navigate(
+        addressElement.value
+      );
+    }
+  );
+
+
+  addressElement.addEventListener(
+    "keydown",
+    event => {
+
+      if (
+        event.key === "Enter"
+      ) {
+
+        navigate(
+          addressElement.value
+        );
+
+      }
+
+    }
+  );
+
+
+  backBtn.addEventListener(
+    "click",
+    goBack
+  );
+
+
+  forwardBtn.addEventListener(
+    "click",
+    goForward
+  );
+
+
+  reloadBtn.addEventListener(
+    "click",
+    reloadPage
+  );
+
+
+  homeBtn.addEventListener(
+    "click",
+    goHome
+  );
+
+
+  /*
+   * ========================================
+   * START
+   * ========================================
+   */
+
+  loadTheme();
+
+  createTab();
+
+</script>
 
 </body>
 </html>
