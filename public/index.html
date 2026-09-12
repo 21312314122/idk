@@ -1,650 +1,726 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>FastProxy</title>
-
-  <style>
-    :root {
-      --bg: #070b14;
-      --panel: rgba(17, 24, 39, .82);
-      --panel-solid: #111827;
-      --panel-soft: rgba(30, 41, 59, .55);
-      --border: rgba(255,255,255,.09);
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent: #6366f1;
-      --accent2: #8b5cf6;
-      --green: #22c55e;
-      --red: #ef4444;
-      --shadow: 0 30px 100px rgba(0,0,0,.45);
-    }
-
-    body.light {
-      --bg: #eef2f7;
-      --panel: rgba(255,255,255,.82);
-      --panel-solid: #ffffff;
-      --panel-soft: rgba(241,245,249,.85);
-      --border: rgba(15,23,42,.09);
-      --text: #0f172a;
-      --muted: #64748b;
-      --shadow: 0 30px 80px rgba(15,23,42,.12);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    body {
-      overflow: hidden;
-    }
-
-    button,
-    input {
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-    }
-
-    .app {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 15% 0%, rgba(99,102,241,.22), transparent 28%),
-        radial-gradient(circle at 90% 100%, rgba(139,92,246,.18), transparent 30%),
-        var(--bg);
-    }
-
-    /* TOP HEADER */
-
-    .header {
-      height: 64px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 0 18px;
-      background: var(--panel);
-      backdrop-filter: blur(25px);
-      border-bottom: 1px solid var(--border);
-      position: relative;
-      z-index: 20;
-    }
-
-    .logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow: 0 10px 30px rgba(99,102,241,.28);
-      font-size: 19px;
-    }
-
-    .brand {
-      font-weight: 900;
-      letter-spacing: -.5px;
-      font-size: 17px;
-    }
-
-    .brand span {
-      color: #8b5cf6;
-    }
-
-    .online {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .online-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 12px rgba(34,197,94,.6);
-    }
-
-    .header-space {
-      flex: 1;
-    }
-
-    .server-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 12px;
-      background: var(--panel-soft);
-      border: 1px solid var(--border);
-      font-size: 12px;
-      cursor: pointer;
-      color: var(--text);
-    }
-
-    .server-pill:hover {
-      border-color: rgba(99,102,241,.45);
-    }
-
-    .tool {
-      width: 38px;
-      height: 38px;
-      border-radius: 11px;
-      background: var(--panel-soft);
-      color: var(--text);
-      cursor: pointer;
-      border: 1px solid var(--border);
-    }
-
-    .tool:hover {
-      border-color: rgba(99,102,241,.45);
-    }
-
-    /* TABS */
-
-    .tabs {
-      display: flex;
-      align-items: end;
-      gap: 5px;
-      min-height: 42px;
-      padding: 0 10px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--border);
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tab {
-      height: 37px;
-      min-width: 145px;
-      max-width: 230px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 11px;
-      background: var(--panel-soft);
-      color: var(--muted);
-      border: 1px solid transparent;
-      border-bottom: 0;
-      border-radius: 10px 10px 0 0;
-      cursor: pointer;
-    }
-
-    .tab.active {
-      color: var(--text);
-      background: var(--bg);
-      border-color: var(--border);
-    }
-
-    .tab-title {
-      flex: 1;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      font-size: 13px;
-    }
-
-    .tab-close {
-      width: 22px;
-      height: 22px;
-      border-radius: 6px;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .tab-close:hover {
-      background: rgba(148,163,184,.12);
-      color: var(--text);
-    }
-
-    .new-tab {
-      width: 35px;
-      height: 35px;
-      margin-bottom: 1px;
-      border-radius: 9px;
-      background: transparent;
-      color: var(--muted);
-      font-size: 22px;
-      cursor: pointer;
-    }
-
-    /* ADDRESS BAR */
-
-    .browser-bar {
-      display: flex;
-      gap: 7px;
-      align-items: center;
-      padding: 9px 10px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: var(--panel-soft);
-      color: var(--text);
-      cursor: pointer;
-      border: 1px solid var(--border);
-      font-size: 17px;
-    }
-
-    .nav-btn:disabled {
-      opacity: .35;
-      cursor: default;
-    }
-
-    .address-wrap {
-      flex: 1;
-      position: relative;
-    }
-
-    .address {
-      width: 100%;
-      height: 40px;
-      padding: 0 72px 0 42px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      outline: none;
-      color: var(--text);
-      background: rgba(2,6,23,.28);
-    }
-
-    body.light .address {
-      background: rgba(255,255,255,.72);
-    }
-
-    .address:focus {
-      border-color: rgba(99,102,241,.8);
-      box-shadow: 0 0 0 3px rgba(99,102,241,.12);
-    }
-
-    .lock {
-      position: absolute;
-      left: 15px;
-      top: 11px;
-      opacity: .7;
-      pointer-events: none;
-    }
-
-    .go {
-      position: absolute;
-      right: 5px;
-      top: 5px;
-      height: 30px;
-      padding: 0 12px;
-      border-radius: 15px;
-      background: linear-gradient(135deg,var(--accent),var(--accent2));
-      color: white;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    /* INFO */
-
-    .info-bar {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      height: 30px;
-      padding: 0 14px;
-      border-bottom: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 11px;
-      background: var(--panel);
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    .info-item strong {
-      color: var(--text);
-    }
-
-    .status-good {
-      color: var(--green);
-    }
-
-    /* CONTENT */
-
-    .content {
-      flex: 1;
-      min-height: 0;
-      position: relative;
-    }
-
-    .tab-page {
-      position: absolute;
-      inset: 0;
-      display: none;
-      background: var(--bg);
-    }
-
-    .tab-page.active {
-      display: block;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: white;
-    }
-
-    /* HOME */
-
-    .home {
-      height: 100%;
-      overflow: auto;
-      display: flex;
-      justify-content: center;
-      padding: 60px 20px;
-    }
-
-    .home-inner {
-      width: min(1050px, 100%);
-      text-align: center;
-    }
-
-    .hero-logo {
-      width: 86px;
-      height: 86px;
-      margin: 0 auto 20px;
-      display: grid;
-      place-items: center;
-      border-radius: 26px;
-      font-size: 38px;
-      background: linear-gradient(135deg,var(--accent),var(--accent2));
-      box-shadow:
-        0 20px 60px rgba(99,102,241,.3),
-        inset 0 1px 0 rgba(255,255,255,.2);
-    }
-
-    .hero-title {
-      margin: 0;
-      font-size: clamp(42px,7vw,75px);
-      letter-spacing: -4px;
-      line-height: .95;
-      font-weight: 950;
-    }
-
-    .hero-title span {
-      background: linear-gradient(90deg,#60a5fa,#8b5cf6,#ec4899);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .hero-subtitle {
-      max-width: 670px;
-      margin: 18px auto 30px;
-      color: var(--muted);
-      line-height: 1.65;
-      font-size: 16px;
-    }
-
-    .hero-search {
-      width: min(800px,100%);
-      margin: auto;
-      display: flex;
-      padding: 7px;
-      gap: 8px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-    }
-
-    .hero-search input {
-      flex: 1;
-      min-width: 0;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      padding: 15px;
-      color: var(--text);
-      font-size: 16px;
-    }
-
-    .hero-search button {
-      padding: 0 24px;
-      border-radius: 13px;
-      color: white;
-      background: linear-gradient(135deg,var(--accent),var(--accent2));
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .section-title {
-      margin-top: 42px;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-      letter-spacing: 1.4px;
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--muted);
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(4,1fr);
-      gap: 12px;
-    }
-
-    .card {
-      text-align: left;
-      padding: 18px;
-      border-radius: 17px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: transform .18s ease, border-color .18s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(99,102,241,.5);
-    }
-
-    .card-icon {
-      font-size: 25px;
-      margin-bottom: 10px;
-    }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 850;
-    }
-
-    .card-url {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    /* LOADING */
-
-    .loading {
-      position: absolute;
-      inset: 0;
-      display: none;
-      place-items: center;
-      z-index: 1000;
-      background: rgba(2,6,23,.94);
-      backdrop-filter: blur(15px);
-    }
-
-    .loading.show {
-      display: grid;
-    }
-
-    .loading-box {
-      width: min(420px,88%);
-      padding: 28px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.1);
-      background: rgba(15,23,42,.86);
-      text-align: center;
-      box-shadow: var(--shadow);
-    }
-
-    .spinner {
-      width: 56px;
-      height: 56px;
-      margin: 0 auto 18px;
-      border-radius: 50%;
-      border: 4px solid rgba(255,255,255,.08);
-      border-top-color: #8b5cf6;
-      animation: spin .8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .loading-title {
-      font-size: 21px;
-      font-weight: 900;
-    }
-
-    .loading-url {
-      margin-top: 8px;
-      color: #94a3b8;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .progress {
-      height: 5px;
-      margin-top: 22px;
-      background: rgba(255,255,255,.08);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      width: 35%;
-      height: 100%;
-      background: linear-gradient(90deg,#60a5fa,#8b5cf6,#ec4899);
-      animation: move 1.3s ease-in-out infinite;
-    }
-
-    @keyframes move {
-      from { transform: translateX(-140%); }
-      to { transform: translateX(380%); }
-    }
-
-    /* SERVER MENU */
-
-    .server-menu {
-      position: fixed;
-      top: 59px;
-      right: 14px;
-      width: 290px;
-      padding: 12px;
-      display: none;
-      z-index: 2000;
-      background: var(--panel-solid);
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      box-shadow: var(--shadow);
-    }
-
-    .server-menu.show {
-      display: block;
-    }
-
-    .server-menu h3 {
-      margin: 4px 5px 10px;
-      font-size: 14px;
-    }
-
-    .server-option {
-      width: 100%;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-align: left;
-      border-radius: 12px;
-      background: transparent;
-      color: var(--text);
-      cursor: pointer;
-    }
-
-    .server-option:hover {
-      background: var(--panel-soft);
-    }
-
-    .server-option .region {
-      flex: 1;
-    }
-
-    .server-option .latency {
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    /* MOBILE */
-
-    @media (max-width: 750px) {
-      .online,
-      .brand {
-        display: none;
-      }
-
-      .cards {
-        grid-template-columns: repeat(2,1fr);
-      }
-
-      .hero-search {
-        flex-direction: column;
-      }
-
-      .hero-search button {
-        height: 50px;
-      }
-
-      .server-pill {
-        font-size: 11px;
-      }
-    }
-  </style>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1.0"
+>
+
+<title>FastProxy</title>
+
+<style>
+
+:root {
+  --bg:#070b14;
+  --panel:#111827;
+  --panel2:#182235;
+  --border:rgba(255,255,255,.08);
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --accent:#6366f1;
+  --accent2:#8b5cf6;
+  --green:#22c55e;
+}
+
+body.light {
+  --bg:#eef2f7;
+  --panel:#ffffff;
+  --panel2:#f3f6fa;
+  --border:rgba(15,23,42,.09);
+  --text:#0f172a;
+  --muted:#64748b;
+}
+
+* {
+  box-sizing:border-box;
+}
+
+html,
+body {
+  width:100%;
+  height:100%;
+  margin:0;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+body {
+  overflow:hidden;
+}
+
+button,
+input {
+  font:inherit;
+}
+
+button {
+  border:0;
+}
+
+.browser {
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:
+    radial-gradient(
+      circle at 15% 0%,
+      rgba(99,102,241,.2),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 90% 100%,
+      rgba(139,92,246,.16),
+      transparent 30%
+    ),
+    var(--bg);
+}
+
+/* HEADER */
+
+.header {
+  height:62px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:0 16px;
+  background:rgba(17,24,39,.82);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+
+body.light .header {
+  background:rgba(255,255,255,.82);
+}
+
+.logo {
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border-radius:12px;
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
+  box-shadow:
+    0 10px 30px
+    rgba(99,102,241,.3);
+  font-size:19px;
+}
+
+.brand {
+  font-weight:900;
+  font-size:17px;
+}
+
+.brand span {
+  color:#8b5cf6;
+}
+
+.online {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.online-dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:
+    0 0 12px
+    rgba(34,197,94,.6);
+}
+
+.space {
+  flex:1;
+}
+
+.server-button {
+  height:38px;
+  padding:0 13px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border-radius:11px;
+  background:var(--panel2);
+  color:var(--text);
+  border:1px solid var(--border);
+  cursor:pointer;
+  font-size:12px;
+}
+
+.server-button:hover {
+  border-color:var(--accent);
+}
+
+.theme {
+  width:38px;
+  height:38px;
+  border-radius:11px;
+  background:var(--panel2);
+  color:var(--text);
+  border:1px solid var(--border);
+  cursor:pointer;
+}
+
+/* TABS */
+
+.tabs {
+  min-height:42px;
+  display:flex;
+  align-items:end;
+  gap:5px;
+  padding:0 9px;
+  background:rgba(17,24,39,.82);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+body.light .tabs {
+  background:rgba(255,255,255,.82);
+}
+
+.tabs::-webkit-scrollbar {
+  display:none;
+}
+
+.tab {
+  height:37px;
+  min-width:145px;
+  max-width:230px;
+  padding:0 10px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  border-radius:10px 10px 0 0;
+  color:var(--muted);
+  background:var(--panel2);
+  cursor:pointer;
+  border:1px solid transparent;
+}
+
+.tab.active {
+  background:var(--bg);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+.tab-title {
+  flex:1;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-size:13px;
+}
+
+.close {
+  width:22px;
+  height:22px;
+  border-radius:6px;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+}
+
+.close:hover {
+  background:rgba(148,163,184,.12);
+  color:var(--text);
+}
+
+.new-tab {
+  width:35px;
+  height:35px;
+  margin-bottom:1px;
+  border-radius:9px;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:22px;
+}
+
+/* NAVIGATION */
+
+.nav {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 10px;
+  background:rgba(17,24,39,.82);
+  border-bottom:1px solid var(--border);
+}
+
+body.light .nav {
+  background:rgba(255,255,255,.82);
+}
+
+.nav-btn {
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  background:var(--panel2);
+  color:var(--text);
+  cursor:pointer;
+  border:1px solid var(--border);
+  font-size:17px;
+}
+
+.nav-btn:disabled {
+  opacity:.3;
+  cursor:default;
+}
+
+.address-wrap {
+  flex:1;
+  position:relative;
+}
+
+.address {
+  width:100%;
+  height:40px;
+  padding:0 65px 0 42px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  outline:none;
+  color:var(--text);
+  background:rgba(2,6,23,.35);
+}
+
+body.light .address {
+  background:#f8fafc;
+}
+
+.address:focus {
+  border-color:var(--accent);
+  box-shadow:
+    0 0 0 3px
+    rgba(99,102,241,.12);
+}
+
+.lock {
+  position:absolute;
+  left:15px;
+  top:11px;
+  opacity:.7;
+}
+
+.go {
+  position:absolute;
+  right:5px;
+  top:5px;
+  height:30px;
+  padding:0 12px;
+  border-radius:15px;
+  color:white;
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+/* INFO */
+
+.info {
+  height:30px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:0 14px;
+  color:var(--muted);
+  font-size:11px;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+  overflow-x:auto;
+}
+
+.info strong {
+  color:var(--text);
+}
+
+.good {
+  color:var(--green);
+}
+
+/* CONTENT */
+
+.content {
+  position:relative;
+  flex:1;
+  min-height:0;
+}
+
+.page {
+  position:absolute;
+  inset:0;
+  display:none;
+}
+
+.page.active {
+  display:block;
+}
+
+iframe {
+  width:100%;
+  height:100%;
+  border:0;
+  background:white;
+}
+
+/* HOME */
+
+.home {
+  height:100%;
+  overflow:auto;
+  display:flex;
+  justify-content:center;
+  padding:65px 20px;
+}
+
+.home-inner {
+  width:min(1050px,100%);
+  text-align:center;
+}
+
+.hero-icon {
+  width:84px;
+  height:84px;
+  margin:0 auto 20px;
+  display:grid;
+  place-items:center;
+  border-radius:25px;
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
+  box-shadow:
+    0 20px 60px
+    rgba(99,102,241,.3);
+  font-size:36px;
+}
+
+.hero {
+  margin:0;
+  font-size:clamp(42px,7vw,74px);
+  letter-spacing:-4px;
+  line-height:.95;
+}
+
+.hero span {
+  background:
+    linear-gradient(
+      90deg,
+      #60a5fa,
+      #8b5cf6,
+      #ec4899
+    );
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.subtitle {
+  max-width:650px;
+  margin:18px auto 30px;
+  color:var(--muted);
+  line-height:1.65;
+}
+
+.home-search {
+  width:min(800px,100%);
+  margin:auto;
+  display:flex;
+  gap:8px;
+  padding:7px;
+  border-radius:18px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  box-shadow:
+    0 25px 80px
+    rgba(0,0,0,.25);
+}
+
+.home-search input {
+  flex:1;
+  min-width:0;
+  padding:15px;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:var(--text);
+  font-size:16px;
+}
+
+.home-search button {
+  padding:0 25px;
+  border-radius:13px;
+  color:white;
+  font-weight:800;
+  cursor:pointer;
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent2)
+    );
+}
+
+.section {
+  margin-top:38px;
+  margin-bottom:14px;
+  font-size:12px;
+  font-weight:800;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.cards {
+  display:grid;
+  grid-template-columns:
+    repeat(4,1fr);
+  gap:12px;
+}
+
+.card {
+  text-align:left;
+  padding:18px;
+  border-radius:17px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);
+  cursor:pointer;
+  transition:
+    transform .18s ease,
+    border-color .18s ease;
+}
+
+.card:hover {
+  transform:translateY(-3px);
+  border-color:var(--accent);
+}
+
+.card-icon {
+  font-size:25px;
+  margin-bottom:10px;
+}
+
+.card-name {
+  font-size:14px;
+  font-weight:850;
+}
+
+.card-url {
+  margin-top:4px;
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* LOADING */
+
+.loading {
+  position:absolute;
+  inset:0;
+  z-index:1000;
+  display:none;
+  place-items:center;
+  background:
+    rgba(2,6,23,.93);
+  backdrop-filter:blur(15px);
+}
+
+.loading.show {
+  display:grid;
+}
+
+.loading-box {
+  width:min(430px,88%);
+  padding:30px;
+  text-align:center;
+  border-radius:21px;
+  background:#111827;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:
+    0 30px 100px
+    rgba(0,0,0,.45);
+}
+
+.spinner {
+  width:58px;
+  height:58px;
+  margin:0 auto 18px;
+  border-radius:50%;
+  border:4px solid rgba(255,255,255,.08);
+  border-top-color:#8b5cf6;
+  animation:
+    spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform:rotate(360deg);
+  }
+}
+
+.loading-title {
+  font-size:21px;
+  font-weight:900;
+}
+
+.loading-url {
+  margin-top:8px;
+  color:#94a3b8;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.progress {
+  height:5px;
+  margin-top:22px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.08);
+}
+
+.progress-bar {
+  width:35%;
+  height:100%;
+  background:
+    linear-gradient(
+      90deg,
+      #60a5fa,
+      #8b5cf6,
+      #ec4899
+    );
+  animation:
+    move 1.3s ease-in-out infinite;
+}
+
+@keyframes move {
+  from {
+    transform:translateX(-140%);
+  }
+
+  to {
+    transform:translateX(380%);
+  }
+}
+
+/* SERVER MENU */
+
+.server-menu {
+  position:fixed;
+  top:58px;
+  right:14px;
+  width:300px;
+  padding:12px;
+  display:none;
+  z-index:3000;
+  border-radius:17px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  box-shadow:
+    0 30px 100px
+    rgba(0,0,0,.35);
+}
+
+.server-menu.show {
+  display:block;
+}
+
+.server-title {
+  padding:4px 6px 10px;
+  font-size:14px;
+  font-weight:850;
+}
+
+.server {
+  width:100%;
+  padding:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-radius:11px;
+  background:transparent;
+  color:var(--text);
+  cursor:pointer;
+  text-align:left;
+}
+
+.server:hover {
+  background:var(--panel2);
+}
+
+.server-name {
+  flex:1;
+}
+
+.server-latency {
+  color:var(--muted);
+  font-size:11px;
+}
+
+@media (max-width:750px) {
+
+  .brand,
+  .online {
+    display:none;
+  }
+
+  .cards {
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+
+  .home-search {
+    flex-direction:column;
+  }
+
+  .home-search button {
+    height:50px;
+  }
+
+}
+
+</style>
+
 </head>
 
 <body>
 
-<div class="app">
+<div class="browser">
 
   <header class="header">
 
-    <div class="logo">⚡</div>
+    <div class="logo">
+      ⚡
+    </div>
 
     <div class="brand">
       Fast<span>Proxy</span>
@@ -655,23 +731,22 @@
       Online
     </div>
 
-    <div class="header-space"></div>
+    <div class="space"></div>
 
     <button
       id="serverButton"
-      class="server-pill"
+      class="server-button"
     >
       🌎
       <span id="serverName">
-        Auto
+        US East
       </span>
-      <span>⌄</span>
+      ▾
     </button>
 
     <button
-      id="themeButton"
-      class="tool"
-      title="Theme"
+      id="theme"
+      class="theme"
     >
       ☀️
     </button>
@@ -684,9 +759,9 @@
     class="server-menu"
   >
 
-    <h3>
-      Proxy server
-    </h3>
+    <div class="server-title">
+      Proxy servers
+    </div>
 
     <div id="serverList"></div>
 
@@ -699,7 +774,7 @@
   ></div>
 
 
-  <div class="browser-bar">
+  <div class="nav">
 
     <button
       id="back"
@@ -755,7 +830,7 @@
   </div>
 
 
-  <div class="info-bar">
+  <div class="info">
 
     <span>
       ⚡ Speed:
@@ -772,16 +847,13 @@
     <span>
       🌎 Server:
       <strong id="currentServer">
-        Auto
+        US East
       </strong>
     </span>
 
     <span>
       ●
-      <strong
-        id="status"
-        class="status-good"
-      >
+      <strong id="status" class="good">
         Ready
       </strong>
     </span>
@@ -828,142 +900,1221 @@
 
 <script>
 
-  /*
-   * ==========================================
-   * PROXY SERVERS
-   * ==========================================
-   *
-   * Add more Render URLs here when you deploy
-   * additional proxy servers.
-   *
-   * Example:
-   *
-   * {
-   *   name: "US West",
-   *   flag: "🇺🇸",
-   *   url: "https://your-west-server.onrender.com"
-   * }
-   */
+/* ========================================================
+   PROXY SERVERS
 
-  const SERVERS = [
-    {
-      name: "US East",
-      flag: "🇺🇸",
-      url: "https://idk-3-89oq.onrender.com"
-    }
+   You currently have ONE server.
 
-    // Add more servers here later.
-  ];
+   Add more Render URLs later here.
+======================================================== */
+
+const SERVERS = [
+  {
+    name: "US East",
+    flag: "🇺🇸",
+    url: "https://idk-3-89oq.onrender.com"
+  }
+];
 
 
-  let selectedServer = null;
+let selectedServer =
+  SERVERS[0];
 
-  let tabs = [];
+let tabs = [];
 
-  let activeTab = null;
+let activeTabId =
+  null;
 
-  let nextTabId = 1;
-
-
-  const tabsEl =
-    document.getElementById("tabs");
-
-  const contentEl =
-    document.getElementById("content");
-
-  const addressEl =
-    document.getElementById("address");
-
-  const loadingEl =
-    document.getElementById("loading");
-
-  const loadingUrlEl =
-    document.getElementById("loadingUrl");
-
-  const speedEl =
-    document.getElementById("speed");
-
-  const cacheEl =
-    document.getElementById("cache");
-
-  const statusEl =
-    document.getElementById("status");
-
-  const serverNameEl =
-    document.getElementById("serverName");
-
-  const currentServerEl =
-    document.getElementById("currentServer");
-
-  const serverMenuEl =
-    document.getElementById("serverMenu");
-
-  const serverListEl =
-    document.getElementById("serverList");
+let nextTabId = 1;
 
 
-  /*
-   * ==========================================
-   * SERVER SELECTION
-   * ==========================================
-   */
+/* ========================================================
+   ELEMENTS
+======================================================== */
 
-  async function selectFastestServer() {
+const tabsEl =
+  document.getElementById("tabs");
 
-    if (!SERVERS.length) {
-      return;
-    }
+const contentEl =
+  document.getElementById("content");
 
-    if (SERVERS.length === 1) {
+const addressEl =
+  document.getElementById("address");
+
+const loadingEl =
+  document.getElementById("loading");
+
+const loadingUrlEl =
+  document.getElementById("loadingUrl");
+
+const speedEl =
+  document.getElementById("speed");
+
+const cacheEl =
+  document.getElementById("cache");
+
+const statusEl =
+  document.getElementById("status");
+
+const serverNameEl =
+  document.getElementById("serverName");
+
+const currentServerEl =
+  document.getElementById("currentServer");
+
+const serverMenuEl =
+  document.getElementById("serverMenu");
+
+const serverListEl =
+  document.getElementById("serverList");
+
+
+/* ========================================================
+   SERVER UI
+======================================================== */
+
+function updateServerUI() {
+
+  serverNameEl.textContent =
+    selectedServer.name;
+
+  currentServerEl.textContent =
+    selectedServer.name;
+
+}
+
+
+function renderServers() {
+
+  serverListEl.innerHTML = "";
+
+  SERVERS.forEach(server => {
+
+    const button =
+      document.createElement("button");
+
+    button.className =
+      "server";
+
+    button.innerHTML = `
+      <span>
+        ${server.flag}
+      </span>
+
+      <span class="server-name">
+        ${server.name}
+      </span>
+
+      <span class="server-latency">
+        Online
+      </span>
+    `;
+
+    button.onclick = () => {
 
       selectedServer =
-        SERVERS[0];
+        server;
 
       updateServerUI();
 
-      return;
-    }
-
-
-    const results =
-      await Promise.all(
-        SERVERS.map(
-          async server => {
-
-            const start =
-              performance.now();
-
-            try {
-
-              await fetch(
-                server.url +
-                "/health",
-                {
-                  mode: "cors",
-                  cache: "no-store"
-                }
-              );
-
-              return {
-                server,
-                latency:
-                  performance.now() -
-                  start
-              };
-
-            } catch {
-
-              return {
-                server,
-                latency: Infinity
-              };
-
-            }
-
-          }
-        )
+      serverMenuEl.classList.remove(
+        "show"
       );
 
+    };
+
+    serverListEl.appendChild(
+      button
+    );
+
+  });
+
+}
+
+
+/* ========================================================
+   PROXY URL
+======================================================== */
+
+function proxyUrl(url) {
+
+  return (
+    selectedServer.url +
+    "/proxy?url=" +
+    encodeURIComponent(url)
+  );
+
+}
+
+
+/* ========================================================
+   HOME
+======================================================== */
+
+function getHomeHTML() {
+
+  return `
+    <div class="home">
+
+      <div class="home-inner">
+
+        <div class="hero-icon">
+          ⚡
+        </div>
+
+        <h1 class="hero">
+          Fast<span>Proxy</span>
+        </h1>
+
+        <p class="subtitle">
+          A premium browser-style proxy with
+          smart caching, multiple proxy servers,
+          tabs and live performance information.
+        </p>
+
+        <div class="home-search">
+
+          <input
+            class="home-input"
+            placeholder="Enter a website..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+
+          <button class="home-go">
+            Browse →
+          </button>
+
+        </div>
+
+        <div class="section">
+          Quick launch
+        </div>
+
+        <div class="cards">
+
+          <button
+            class="card"
+            data-url="https://example.com"
+          >
+            <div class="card-icon">
+              🌐
+            </div>
+
+            <div class="card-name">
+              Example
+            </div>
+
+            <div class="card-url">
+              example.com
+            </div>
+          </button>
+
+
+          <button
+            class="card"
+            data-url="https://www.google.com"
+          >
+            <div class="card-icon">
+              🔎
+            </div>
+
+            <div class="card-name">
+              Google
+            </div>
+
+            <div class="card-url">
+              google.com
+            </div>
+          </button>
+
+
+          <button
+            class="card"
+            data-url="https://www.wikipedia.org"
+          >
+            <div class="card-icon">
+              📚
+            </div>
+
+            <div class="card-name">
+              Wikipedia
+            </div>
+
+            <div class="card-url">
+              wikipedia.org
+            </div>
+          </button>
+
+
+          <button
+            class="card"
+            data-url="https://www.poki.com"
+          >
+            <div class="card-icon">
+              🎮
+            </div>
+
+            <div class="card-name">
+              Poki
+            </div>
+
+            <div class="card-url">
+              poki.com
+            </div>
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+}
+
+
+/* ========================================================
+   CREATE TAB
+======================================================== */
+
+function createTab() {
+
+  const id =
+    nextTabId++;
+
+  const page =
+    document.createElement("div");
+
+  page.className =
+    "page";
+
+  page.innerHTML =
+    getHomeHTML();
+
+  contentEl.appendChild(
+    page
+  );
+
+
+  const tab = {
+
+    id,
+
+    title:
+      "New Tab",
+
+    url:
+      null,
+
+    history:
+      [],
+
+    historyIndex:
+      -1,
+
+    page,
+
+    iframe:
+      null,
+
+    start:
+      null
+
+  };
+
+
+  tabs.push(tab);
+
+  activeTabId =
+    id;
+
+
+  attachHomeEvents(
+    page
+  );
+
+  renderTabs();
+
+  switchTab(id);
+
+  return tab;
+
+}
+
+
+/* ========================================================
+   GET ACTIVE TAB
+======================================================== */
+
+function getActiveTab() {
+
+  return tabs.find(
+    tab =>
+      tab.id === activeTabId
+  );
+
+}
+
+
+/* ========================================================
+   NAVIGATE
+======================================================== */
+
+function navigate(rawUrl) {
+
+  let url =
+    rawUrl.trim();
+
+  if (!url) {
+    return;
+  }
+
+
+  if (
+    !/^https?:\/\//i.test(url)
+  ) {
+
+    url =
+      "https://" + url;
+
+  }
+
+
+  try {
+
+    url =
+      new URL(url).href;
+
+  } catch {
+
+    statusEl.textContent =
+      "Invalid URL";
+
+    return;
+
+  }
+
+
+  const tab =
+    getActiveTab();
+
+  if (!tab) {
+    return;
+  }
+
+
+  showLoading(url);
+
+
+  const start =
+    performance.now();
+
+
+  const iframe =
+    document.createElement(
+      "iframe"
+    );
+
+
+  iframe.src =
+    proxyUrl(url);
+
+
+  iframe.loading =
+    "eager";
+
+
+  iframe.addEventListener(
+    "load",
+    () => {
+
+      const elapsed =
+        performance.now() -
+        start;
+
+
+      speedEl.textContent =
+        elapsed < 1000
+          ? Math.round(elapsed) + " ms"
+          : (elapsed / 1000).toFixed(2) +
+            " s";
+
+
+      loadingEl.classList.remove(
+        "show"
+      );
+
+
+      cacheEl.textContent =
+        "Active";
+
+
+      statusEl.textContent =
+        "Loaded";
+
+    }
+  );
+
+
+  tab.page.innerHTML =
+    "";
+
+  tab.page.appendChild(
+    iframe
+  );
+
+
+  tab.iframe =
+    iframe;
+
+  tab.url =
+    url;
+
+  tab.title =
+    getDomain(url);
+
+
+  tab.history =
+    tab.history.slice(
+      0,
+      tab.historyIndex + 1
+    );
+
+
+  tab.history.push(
+    url
+  );
+
+
+  tab.historyIndex =
+    tab.history.length - 1;
+
+
+  renderTabs();
+
+  updateAddress();
+
+  updateNavigation();
+
+}
+
+
+/* ========================================================
+   LOADING
+======================================================== */
+
+function showLoading(url) {
+
+  loadingUrlEl.textContent =
+    url;
+
+  loadingEl.classList.add(
+    "show"
+  );
+
+  statusEl.textContent =
+    "Loading";
+
+  speedEl.textContent =
+    "Loading...";
+
+}
+
+
+/* ========================================================
+   SWITCH TAB
+======================================================== */
+
+function switchTab(id) {
+
+  activeTabId =
+    id;
+
+
+  tabs.forEach(tab => {
+
+    tab.page.classList.toggle(
+      "active",
+      tab.id === id
+    );
+
+  });
+
+
+  renderTabs();
+
+  updateAddress();
+
+  updateNavigation();
+
+
+  const tab =
+    getActiveTab();
+
+
+  if (tab && tab.url) {
+
+    statusEl.textContent =
+      "Ready";
+
+  } else {
+
+    statusEl.textContent =
+      "Home";
+
+  }
+
+}
+
+
+/* ========================================================
+   RENDER TABS
+======================================================== */
+
+function renderTabs() {
+
+  tabsEl.innerHTML =
+    "";
+
+
+  tabs.forEach(tab => {
+
+    const element =
+      document.createElement(
+        "div"
+      );
+
+    element.className =
+      "tab" +
+      (
+        tab.id === activeTabId
+          ? " active"
+          : ""
+      );
+
+
+    const title =
+      document.createElement(
+        "div"
+      );
+
+    title.className =
+      "tab-title";
+
+    title.textContent =
+      tab.title;
+
+
+    const close =
+      document.createElement(
+        "button"
+      );
+
+    close.className =
+      "close";
+
+    close.textContent =
+      "×";
+
+
+    close.onclick = event => {
+
+      event.stopPropagation();
+
+      closeTab(tab.id);
+
+    };
+
+
+    element.appendChild(
+      title
+    );
+
+    element.appendChild(
+      close
+    );
+
+
+    element.onclick =
+      () =>
+        switchTab(tab.id);
+
+
+    tabsEl.appendChild(
+      element
+    );
+
+  });
+
+
+  const plus =
+    document.createElement(
+      "button"
+    );
+
+  plus.className =
+    "new-tab";
+
+  plus.textContent =
+    "+";
+
+  plus.onclick =
+    () => createTab();
+
+
+  tabsEl.appendChild(
+    plus
+  );
+
+}
+
+
+/* ========================================================
+   CLOSE TAB
+======================================================== */
+
+function closeTab(id) {
+
+  const index =
+    tabs.findIndex(
+      tab =>
+        tab.id === id
+    );
+
+
+  if (index === -1) {
+    return;
+  }
+
+
+  tabs[index].page.remove();
+
+  tabs.splice(
+    index,
+    1
+  );
+
+
+  if (!tabs.length) {
+
+    createTab();
+
+    return;
+
+  }
+
+
+  if (activeTabId === id) {
+
+    const newIndex =
+      Math.max(
+        0,
+        index - 1
+      );
+
+
+    activeTabId =
+      tabs[newIndex].id;
+
+  }
+
+
+  renderTabs();
+
+  switchTab(
+    activeTabId
+  );
+
+}
+
+
+/* ========================================================
+   ADDRESS
+======================================================== */
+
+function updateAddress() {
+
+  const tab =
+    getActiveTab();
+
+
+  addressEl.value =
+    tab && tab.url
+      ? tab.url
+      : "";
+
+}
+
+
+/* ========================================================
+   HISTORY
+======================================================== */
+
+function updateNavigation() {
+
+  const tab =
+    getActiveTab();
+
+
+  if (!tab) {
+    return;
+  }
+
+
+  document.getElementById(
+    "back"
+  ).disabled =
+    tab.historyIndex <= 0;
+
+
+  document.getElementById(
+    "forward"
+  ).disabled =
+    tab.historyIndex >=
+      tab.history.length - 1;
+
+}
+
+
+function loadHistory(
+  tab,
+  url
+) {
+
+  showLoading(url);
+
+
+  const iframe =
+    document.createElement(
+      "iframe"
+    );
+
+
+  iframe.src =
+    proxyUrl(url);
+
+
+  const start =
+    performance.now();
+
+
+  iframe.addEventListener(
+    "load",
+    () => {
+
+      const elapsed =
+        performance.now() -
+        start;
+
+
+      speedEl.textContent =
+        elapsed < 1000
+          ? Math.round(elapsed) +
+            " ms"
+          : (elapsed / 1000).toFixed(2) +
+            " s";
+
+
+      loadingEl.classList.remove(
+        "show"
+      );
+
+      statusEl.textContent =
+        "Loaded";
+
+    }
+  );
+
+
+  tab.page.innerHTML =
+    "";
+
+  tab.page.appendChild(
+    iframe
+  );
+
+  tab.iframe =
+    iframe;
+
+  tab.url =
+    url;
+
+  tab.title =
+    getDomain(url);
+
+
+  updateAddress();
+
+  updateNavigation();
+
+}
+
+
+document.getElementById(
+  "back"
+).onclick = () => {
+
+  const tab =
+    getActiveTab();
+
+
+  if (
+    !tab ||
+    tab.historyIndex <= 0
+  ) {
+    return;
+  }
+
+
+  tab.historyIndex--;
+
+
+  loadHistory(
+    tab,
+    tab.history[
+      tab.historyIndex
+    ]
+  );
+
+};
+
+
+document.getElementById(
+  "forward"
+).onclick = () => {
+
+  const tab =
+    getActiveTab();
+
+
+  if (
+    !tab ||
+    tab.historyIndex >=
+      tab.history.length - 1
+  ) {
+    return;
+  }
+
+
+  tab.historyIndex++;
+
+
+  loadHistory(
+    tab,
+    tab.history[
+      tab.historyIndex
+    ]
+  );
+
+};
+
+
+/* ========================================================
+   HOME / RELOAD
+======================================================== */
+
+document.getElementById(
+  "home"
+).onclick = () => {
+
+  const tab =
+    getActiveTab();
+
+
+  if (!tab) {
+    return;
+  }
+
+
+  tab.url =
+    null;
+
+  tab.title =
+    "New Tab";
+
+  tab.history =
+    [];
+
+  tab.historyIndex =
+    -1;
+
+  tab.page.innerHTML =
+    getHomeHTML();
+
+  tab.iframe =
+    null;
+
+
+  attachHomeEvents(
+    tab.page
+  );
+
+
+  renderTabs();
+
+  updateAddress();
+
+  updateNavigation();
+
+
+  speedEl.textContent =
+    "—";
+
+  cacheEl.textContent =
+    "Ready";
+
+  statusEl.textContent =
+    "Home";
+
+};
+
+
+document.getElementById(
+  "reload"
+).onclick = () => {
+
+  const tab =
+    getActiveTab();
+
+
+  if (!tab || !tab.url) {
+    return;
+  }
+
+
+  navigate(
+    tab.url
+  );
+
+};
+
+
+/* ========================================================
+   ADDRESS BAR
+======================================================== */
+
+document.getElementById(
+  "go"
+).onclick = () => {
+
+  navigate(
+    addressEl.value
+  );
+
+};
+
+
+addressEl.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      navigate(
+        addressEl.value
+      );
+
+    }
+
+  }
+);
+
+
+/* ========================================================
+   HOME EVENTS
+======================================================== */
+
+function attachHomeEvents(
+  page
+) {
+
+  const input =
+    page.querySelector(
+      ".home-input"
+    );
+
+  const button =
+    page.querySelector(
+      ".home-go"
+    );
+
+
+  if (input && button) {
+
+    button.onclick =
+      () =>
+        navigate(
+          input.value
+        );
+
+
+    input.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key === "Enter"
+        ) {
+
+          navigate(
+            input.value
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+  page
+    .querySelectorAll(
+      ".card"
+    )
+    .forEach(card => {
+
+      card.onclick =
+        () =>
+          navigate(
+            card.dataset.url
+          );
+
+    });
+
+}
+
+
+/* ========================================================
+   THEME
+======================================================== */
+
+const themeButton =
+  document.getElementById(
+    "theme"
+  );
+
+
+const savedTheme =
+  localStorage.getItem(
+    "fastproxy-theme"
+  );
+
+
+if (
+  savedTheme === "light"
+) {
+
+  document.body.classList.add(
+    "light"
+  );
+
+  themeButton.textContent =
+    "🌙";
+
+}
+
+
+themeButton.onclick =
+  () => {
+
+    const light =
+      document.body.classList.toggle(
+        "light"
+      );
+
+
+    localStorage.setItem(
+      "fastproxy-theme",
+      light
+        ? "light"
+        : "dark"
+    );
+
+
+    themeButton.textContent =
+      light
+        ? "🌙"
+        : "☀️";
+
+  };
+
+
+/* ========================================================
+   SERVER MENU
+======================================================== */
+
+document.getElementById(
+  "serverButton"
+).onclick = () => {
+
+  serverMenuEl.classList.toggle(
+    "show"
+  );
+
+};
+
+
+function selectFastestServer() {
+
+  if (
+    SERVERS.length === 1
+  ) {
+
+    selectedServer =
+      SERVERS[0];
+
+    updateServerUI();
+
+    renderServers();
+
+    return;
+
+  }
+
+
+  Promise.all(
+    SERVERS.map(
+      async server => {
+
+        const start =
+          performance.now();
+
+        try {
+
+          await fetch(
+            server.url +
+            "/health",
+            {
+              cache:
+                "no-store"
+            }
+          );
+
+
+          return {
+            server,
+            latency:
+              performance.now() -
+              start
+          };
+
+        } catch {
+
+          return {
+            server,
+            latency:
+              Infinity
+          };
+
+        }
+
+      }
+    )
+  ).then(results => {
 
     results.sort(
       (a,b) =>
@@ -975,1100 +2126,55 @@
     selectedServer =
       results[0].server;
 
+
     updateServerUI();
 
-    renderServerList(
-      results
-    );
-  }
 
+    renderServers();
 
-  function updateServerUI() {
+  });
 
-    if (!selectedServer) {
-      return;
-    }
+}
 
-    serverNameEl.textContent =
-      selectedServer.name;
 
-    currentServerEl.textContent =
-      selectedServer.name;
-  }
+/* ========================================================
+   DOMAIN
+======================================================== */
 
+function getDomain(url) {
 
-  function renderServerList(
-    results = []
-  ) {
+  try {
 
-    serverListEl.innerHTML =
-      "";
-
-
-    results.forEach(
-      ({server, latency}) => {
-
-        const button =
-          document.createElement(
-            "button"
-          );
-
-        button.className =
-          "server-option";
-
-
-        const latencyText =
-          latency === Infinity
-            ? "Offline"
-            : Math.round(latency) +
-              " ms";
-
-
-        button.innerHTML = `
-          <span>
-            ${server.flag}
-          </span>
-
-          <span class="region">
-            ${server.name}
-          </span>
-
-          <span class="latency">
-            ${latencyText}
-          </span>
-        `;
-
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            selectedServer =
-              server;
-
-            updateServerUI();
-
-            serverMenuEl.classList.remove(
-              "show"
-            );
-
-          }
-        );
-
-
-        serverListEl.appendChild(
-          button
-        );
-
-      }
-    );
-  }
-
-
-  /*
-   * ==========================================
-   * PROXY URL
-   * ==========================================
-   */
-
-  function proxyUrl(url) {
-
-    return (
-      selectedServer.url +
-      "/proxy?url=" +
-      encodeURIComponent(url)
-    );
-
-  }
-
-
-  /*
-   * ==========================================
-   * HOME
-   * ==========================================
-   */
-
-  function homeHTML() {
-
-    return `
-      <div class="home">
-
-        <div class="home-inner">
-
-          <div class="hero-logo">
-            ⚡
-          </div>
-
-          <h1 class="hero-title">
-            Welcome to
-            <span>FastProxy</span>
-          </h1>
-
-          <p class="hero-subtitle">
-            A premium browser-style proxy with
-            multiple servers, smart caching,
-            performance tracking and tabs.
-          </p>
-
-          <div class="hero-search">
-
-            <input
-              class="hero-input"
-              placeholder="Enter a website..."
-              autocomplete="off"
-              spellcheck="false"
-            >
-
-            <button
-              class="hero-go"
-            >
-              Browse →
-            </button>
-
-          </div>
-
-          <div class="section-title">
-            Quick launch
-          </div>
-
-          <div class="cards">
-
-            <button
-              class="card"
-              data-url="https://example.com"
-            >
-              <div class="card-icon">🌐</div>
-              <div class="card-title">Example</div>
-              <div class="card-url">example.com</div>
-            </button>
-
-            <button
-              class="card"
-              data-url="https://www.google.com"
-            >
-              <div class="card-icon">🔎</div>
-              <div class="card-title">Google</div>
-              <div class="card-url">google.com</div>
-            </button>
-
-            <button
-              class="card"
-              data-url="https://www.wikipedia.org"
-            >
-              <div class="card-icon">📚</div>
-              <div class="card-title">Wikipedia</div>
-              <div class="card-url">wikipedia.org</div>
-            </button>
-
-            <button
-              class="card"
-              data-url="https://www.poki.com"
-            >
-              <div class="card-icon">🎮</div>
-              <div class="card-title">Poki</div>
-              <div class="card-url">poki.com</div>
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-    `;
-  }
-
-
-  /*
-   * ==========================================
-   * CREATE TAB
-   * ==========================================
-   */
-
-  function createTab() {
-
-    const id =
-      nextTabId++;
-
-
-    const page =
-      document.createElement("div");
-
-    page.className =
-      "tab-page";
-
-
-    page.innerHTML =
-      homeHTML();
-
-
-    contentEl.appendChild(
-      page
-    );
-
-
-    const tab = {
-      id,
-      title: "New Tab",
-      url: null,
-      history: [],
-      historyIndex: -1,
-      page,
-      iframe: null,
-      start: null
-    };
-
-
-    tabs.push(tab);
-
-    activeTab =
-      id;
-
-
-    attachHomeEvents(page);
-
-    renderTabs();
-
-    switchTab(id);
-
-    return tab;
-  }
-
-
-  /*
-   * ==========================================
-   * NAVIGATION
-   * ==========================================
-   */
-
-  function navigate(raw) {
-
-    let value =
-      raw.trim();
-
-    if (!value) {
-      return;
-    }
-
-
-    if (
-      !/^https?:\/\//i.test(
-        value
-      )
-    ) {
-
-      value =
-        "https://" + value;
-
-    }
-
-
-    try {
-
-      value =
-        new URL(value).href;
-
-    } catch {
-
-      statusEl.textContent =
-        "Invalid URL";
-
-      return;
-    }
-
-
-    if (!selectedServer) {
-
-      statusEl.textContent =
-        "Finding server...";
-
-      selectFastestServer().then(
-        () => navigate(value)
+    return new URL(url)
+      .hostname
+      .replace(
+        /^www\./,
+        ""
       );
 
-      return;
+  } catch {
 
-    }
-
-
-    const tab =
-      getActiveTab();
-
-    if (!tab) {
-      return;
-    }
-
-
-    showLoading(value);
-
-
-    tab.start =
-      performance.now();
-
-
-    const iframe =
-      document.createElement("iframe");
-
-
-    iframe.src =
-      proxyUrl(value);
-
-
-    iframe.loading =
-      "eager";
-
-
-    iframe.addEventListener(
-      "load",
-      () => {
-
-        const elapsed =
-          performance.now() -
-          tab.start;
-
-
-        updateSpeed(
-          elapsed
-        );
-
-
-        loadingEl.classList.remove(
-          "show"
-        );
-
-
-        cacheEl.textContent =
-          elapsed < 1000
-            ? "Active"
-            : "Ready";
-
-
-        statusEl.textContent =
-          "Loaded";
-
-
-      }
-    );
-
-
-    tab.page.innerHTML =
-      "";
-
-    tab.page.appendChild(
-      iframe
-    );
-
-
-    tab.iframe =
-      iframe;
-
-    tab.url =
-      value;
-
-    tab.title =
-      getDomain(value);
-
-
-    tab.history =
-      tab.history.slice(
-        0,
-        tab.historyIndex + 1
-      );
-
-
-    tab.history.push(
-      value
-    );
-
-
-    tab.historyIndex =
-      tab.history.length - 1;
-
-
-    renderTabs();
-
-    updateAddress();
-
-    updateNavigation();
+    return "New Tab";
 
   }
 
+}
 
-  function showLoading(url) {
 
-    loadingUrlEl.textContent =
-      url;
+/* ========================================================
+   START
+======================================================== */
 
-    loadingEl.classList.add(
-      "show"
-    );
+updateServerUI();
 
-    statusEl.textContent =
-      "Loading";
+renderServers();
 
-  }
+selectFastestServer();
 
-
-  function updateSpeed(ms) {
-
-    speedEl.textContent =
-      ms < 1000
-        ? Math.round(ms) + " ms"
-        : (ms / 1000).toFixed(2) +
-          " s";
-  }
-
-
-  /*
-   * ==========================================
-   * TABS
-   * ==========================================
-   */
-
-  function renderTabs() {
-
-    tabsEl.innerHTML =
-      "";
-
-
-    tabs.forEach(
-      tab => {
-
-        const el =
-          document.createElement(
-            "div"
-          );
-
-        el.className =
-          "tab" +
-          (
-            tab.id === activeTab
-              ? " active"
-              : ""
-          );
-
-
-        const title =
-          document.createElement(
-            "div"
-          );
-
-        title.className =
-          "tab-title";
-
-        title.textContent =
-          tab.title;
-
-
-        const close =
-          document.createElement(
-            "button"
-          );
-
-        close.className =
-          "tab-close";
-
-        close.textContent =
-          "×";
-
-
-        close.onclick =
-          event => {
-
-            event.stopPropagation();
-
-            closeTab(tab.id);
-
-          };
-
-
-        el.appendChild(
-          title
-        );
-
-        el.appendChild(
-          close
-        );
-
-
-        el.onclick =
-          () => {
-            switchTab(tab.id);
-          };
-
-
-        tabsEl.appendChild(
-          el
-        );
-
-      }
-    );
-
-
-    const plus =
-      document.createElement(
-        "button"
-      );
-
-    plus.className =
-      "new-tab";
-
-    plus.textContent =
-      "+";
-
-
-    plus.onclick =
-      () => createTab();
-
-
-    tabsEl.appendChild(
-      plus
-    );
-
-  }
-
-
-  function switchTab(id) {
-
-    activeTab =
-      id;
-
-
-    tabs.forEach(
-      tab => {
-
-        tab.page.classList.toggle(
-          "active",
-          tab.id === id
-        );
-
-      }
-    );
-
-
-    const tab =
-      getActiveTab();
-
-    updateAddress();
-
-    updateNavigation();
-
-
-    statusEl.textContent =
-      tab && tab.url
-        ? "Ready"
-        : "Home";
-
-  }
-
-
-  function closeTab(id) {
-
-    const index =
-      tabs.findIndex(
-        tab => tab.id === id
-      );
-
-
-    if (index === -1) {
-      return;
-    }
-
-
-    tabs[index].page.remove();
-
-    tabs.splice(
-      index,
-      1
-    );
-
-
-    if (!tabs.length) {
-
-      createTab();
-
-      return;
-
-    }
-
-
-    if (activeTab === id) {
-
-      const newIndex =
-        Math.max(
-          0,
-          index - 1
-        );
-
-      activeTab =
-        tabs[newIndex].id;
-
-    }
-
-
-    renderTabs();
-
-    switchTab(
-      activeTab
-    );
-
-  }
-
-
-  function getActiveTab() {
-
-    return tabs.find(
-      tab =>
-        tab.id === activeTab
-    );
-
-  }
-
-
-  /*
-   * ==========================================
-   * HISTORY
-   * ==========================================
-   */
-
-  function updateNavigation() {
-
-    const tab =
-      getActiveTab();
-
-    if (!tab) {
-      return;
-    }
-
-
-    document.getElementById(
-      "back"
-    ).disabled =
-      tab.historyIndex <= 0;
-
-
-    document.getElementById(
-      "forward"
-    ).disabled =
-      tab.historyIndex >=
-      tab.history.length - 1;
-
-  }
-
-
-  function back() {
-
-    const tab =
-      getActiveTab();
-
-
-    if (
-      !tab ||
-      tab.historyIndex <= 0
-    ) {
-      return;
-    }
-
-
-    tab.historyIndex--;
-
-    loadHistory(
-      tab,
-      tab.history[
-        tab.historyIndex
-      ]
-    );
-
-  }
-
-
-  function forward() {
-
-    const tab =
-      getActiveTab();
-
-
-    if (
-      !tab ||
-      tab.historyIndex >=
-      tab.history.length - 1
-    ) {
-      return;
-    }
-
-
-    tab.historyIndex++;
-
-    loadHistory(
-      tab,
-      tab.history[
-        tab.historyIndex
-      ]
-    );
-
-  }
-
-
-  function loadHistory(tab,url) {
-
-    showLoading(url);
-
-    const iframe =
-      document.createElement(
-        "iframe"
-      );
-
-    iframe.src =
-      proxyUrl(url);
-
-    tab.page.innerHTML =
-      "";
-
-    tab.page.appendChild(
-      iframe
-    );
-
-    tab.iframe =
-      iframe;
-
-    tab.url =
-      url;
-
-    tab.title =
-      getDomain(url);
-
-    updateAddress();
-
-    updateNavigation();
-
-  }
-
-
-  /*
-   * ==========================================
-   * HOME
-   * ==========================================
-   */
-
-  function home() {
-
-    const tab =
-      getActiveTab();
-
-    if (!tab) {
-      return;
-    }
-
-
-    tab.url = null;
-
-    tab.title =
-      "New Tab";
-
-    tab.history = [];
-
-    tab.historyIndex =
-      -1;
-
-    tab.page.innerHTML =
-      homeHTML();
-
-    tab.iframe =
-      null;
-
-
-    attachHomeEvents(
-      tab.page
-    );
-
-
-    renderTabs();
-
-    updateAddress();
-
-    updateNavigation();
-
-    statusEl.textContent =
-      "Home";
-
-    speedEl.textContent =
-      "—";
-
-    cacheEl.textContent =
-      "Ready";
-
-  }
-
-
-  /*
-   * ==========================================
-   * HOME EVENTS
-   * ==========================================
-   */
-
-  function attachHomeEvents(page) {
-
-    const input =
-      page.querySelector(
-        ".hero-input"
-      );
-
-    const button =
-      page.querySelector(
-        ".hero-go"
-      );
-
-
-    if (input && button) {
-
-      button.onclick =
-        () => navigate(
-          input.value
-        );
-
-
-      input.addEventListener(
-        "keydown",
-        event => {
-
-          if (
-            event.key === "Enter"
-          ) {
-
-            navigate(
-              input.value
-            );
-
-          }
-
-        }
-      );
-
-    }
-
-
-    page
-      .querySelectorAll(
-        ".card"
-      )
-      .forEach(
-        card => {
-
-          card.onclick =
-            () => navigate(
-              card.dataset.url
-            );
-
-        }
-      );
-
-  }
-
-
-  /*
-   * ==========================================
-   * ADDRESS
-   * ==========================================
-   */
-
-  function updateAddress() {
-
-    const tab =
-      getActiveTab();
-
-    addressEl.value =
-      tab && tab.url
-        ? tab.url
-        : "";
-
-  }
-
-
-  document.getElementById(
-    "go"
-  ).onclick =
-    () => navigate(
-      addressEl.value
-    );
-
-
-  addressEl.addEventListener(
-    "keydown",
-    event => {
-
-      if (
-        event.key === "Enter"
-      ) {
-
-        navigate(
-          addressEl.value
-        );
-
-      }
-
-    }
-  );
-
-
-  document.getElementById(
-    "back"
-  ).onclick =
-    back;
-
-
-  document.getElementById(
-    "forward"
-  ).onclick =
-    forward;
-
-
-  document.getElementById(
-    "home"
-  ).onclick =
-    home;
-
-
-  document.getElementById(
-    "reload"
-  ).onclick =
-    () => {
-
-      const tab =
-        getActiveTab();
-
-      if (
-        tab &&
-        tab.url
-      ) {
-
-        navigate(
-          tab.url
-        );
-
-      }
-
-    };
-
-
-  /*
-   * ==========================================
-   * SERVER MENU
-   * ==========================================
-   */
-
-  document.getElementById(
-    "serverButton"
-  ).onclick =
-    () => {
-
-      serverMenuEl.classList.toggle(
-        "show"
-      );
-
-    };
-
-
-  /*
-   * ==========================================
-   * THEME
-   * ==========================================
-   */
-
-  const themeButton =
-    document.getElementById(
-      "themeButton"
-    );
-
-
-  function loadTheme() {
-
-    const saved =
-      localStorage.getItem(
-        "fastproxy-theme"
-      );
-
-
-    if (
-      saved === "light"
-    ) {
-
-      document.body.classList.add(
-        "light"
-      );
-
-      themeButton.textContent =
-        "🌙";
-
-    }
-
-  }
-
-
-  themeButton.onclick =
-    () => {
-
-      const light =
-        document.body.classList.toggle(
-          "light"
-        );
-
-
-      localStorage.setItem(
-        "fastproxy-theme",
-        light
-          ? "light"
-          : "dark"
-      );
-
-
-      themeButton.textContent =
-        light
-          ? "🌙"
-          : "☀️";
-
-    };
-
-
-  /*
-   * ==========================================
-   * DOMAIN
-   * ==========================================
-   */
-
-  function getDomain(url) {
-
-    try {
-
-      return new URL(url)
-        .hostname
-        .replace(
-          /^www\./,
-          ""
-        );
-
-    } catch {
-
-      return "New Tab";
-
-    }
-
-  }
-
-
-  /*
-   * ==========================================
-   * START
-   * ==========================================
-   */
-
-  loadTheme();
-
-  renderServerList();
-
-  createTab();
-
-  selectFastestServer();
+createTab();
 
 </script>
 
 </body>
+
 </html>
