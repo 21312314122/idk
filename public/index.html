@@ -7,7 +7,7 @@
 
 <meta
   name="viewport"
-  content="width=device-width,initial-scale=1.0"
+  content="width=device-width, initial-scale=1.0"
 >
 
 <title>FastProxy</title>
@@ -15,24 +15,34 @@
 <style>
 
 :root {
-  --bg:#070b14;
-  --panel:#111827;
-  --panel2:#182235;
+
+  --bg:#060a13;
+  --panel:#101827;
+  --panel2:#172235;
   --border:rgba(255,255,255,.08);
+
   --text:#f8fafc;
   --muted:#94a3b8;
+
   --accent:#6366f1;
   --accent2:#8b5cf6;
+
   --green:#22c55e;
+  --yellow:#facc15;
+  --red:#ef4444;
+
 }
 
 body.light {
+
   --bg:#eef2f7;
   --panel:#ffffff;
   --panel2:#f3f6fa;
   --border:rgba(15,23,42,.09);
+
   --text:#0f172a;
   --muted:#64748b;
+
 }
 
 * {
@@ -41,9 +51,11 @@ body.light {
 
 html,
 body {
+
   width:100%;
   height:100%;
   margin:0;
+
   font-family:
     Inter,
     system-ui,
@@ -51,8 +63,10 @@ body {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+
   background:var(--bg);
   color:var(--text);
+
 }
 
 body {
@@ -69,62 +83,96 @@ button {
 }
 
 .browser {
+
   height:100vh;
+
   display:flex;
   flex-direction:column;
+
   background:
+
     radial-gradient(
-      circle at 15% 0%,
-      rgba(99,102,241,.2),
-      transparent 27%
+      circle at 10% 0%,
+      rgba(99,102,241,.20),
+      transparent 28%
     ),
+
     radial-gradient(
-      circle at 90% 100%,
-      rgba(139,92,246,.16),
+      circle at 95% 100%,
+      rgba(139,92,246,.15),
       transparent 30%
     ),
+
     var(--bg);
+
 }
 
-/* HEADER */
+/* =========================================================
+   HEADER
+========================================================= */
 
 .header {
+
   height:62px;
+
   flex-shrink:0;
+
   display:flex;
   align-items:center;
+
   gap:12px;
-  padding:0 16px;
-  background:rgba(17,24,39,.82);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
+
+  padding:
+    0 16px;
+
+  background:
+    rgba(16,24,39,.82);
+
+  backdrop-filter:
+    blur(25px);
+
+  border-bottom:
+    1px solid var(--border);
+
 }
 
 body.light .header {
-  background:rgba(255,255,255,.82);
+
+  background:
+    rgba(255,255,255,.82);
+
 }
 
 .logo {
-  width:38px;
-  height:38px;
+
+  width:39px;
+  height:39px;
+
   display:grid;
   place-items:center;
-  border-radius:12px;
+
+  border-radius:13px;
+
   background:
     linear-gradient(
       135deg,
       var(--accent),
       var(--accent2)
     );
+
   box-shadow:
-    0 10px 30px
-    rgba(99,102,241,.3);
-  font-size:19px;
+    0 12px 35px
+    rgba(99,102,241,.32);
+
+  font-size:20px;
+
 }
 
 .brand {
+
   font-weight:900;
   font-size:17px;
+
 }
 
 .brand span {
@@ -132,71 +180,217 @@ body.light .header {
 }
 
 .online {
+
   display:flex;
   align-items:center;
+
   gap:6px;
-  font-size:12px;
+
   color:var(--muted);
+
+  font-size:12px;
+
 }
 
 .online-dot {
+
   width:8px;
   height:8px;
+
   border-radius:50%;
-  background:var(--green);
+
+  background:
+    var(--green);
+
   box-shadow:
     0 0 12px
-    rgba(34,197,94,.6);
+    rgba(34,197,94,.65);
+
 }
 
-.space {
+.header-space {
   flex:1;
 }
 
 .server-button {
+
   height:38px;
-  padding:0 13px;
+
   display:flex;
   align-items:center;
+
   gap:8px;
+
+  padding:
+    0 13px;
+
   border-radius:11px;
-  background:var(--panel2);
+
+  background:
+    var(--panel2);
+
   color:var(--text);
-  border:1px solid var(--border);
+
+  border:
+    1px solid var(--border);
+
   cursor:pointer;
+
   font-size:12px;
+
 }
 
 .server-button:hover {
-  border-color:var(--accent);
+
+  border-color:
+    var(--accent);
+
 }
 
 .theme {
+
   width:38px;
   height:38px;
+
   border-radius:11px;
-  background:var(--panel2);
+
+  background:
+    var(--panel2);
+
   color:var(--text);
-  border:1px solid var(--border);
+
+  border:
+    1px solid var(--border);
+
   cursor:pointer;
+
 }
 
-/* TABS */
+/* =========================================================
+   SERVER MENU
+========================================================= */
+
+.server-menu {
+
+  position:
+    fixed;
+
+  top:58px;
+  right:12px;
+
+  width:280px;
+
+  display:none;
+
+  z-index:5000;
+
+  padding:12px;
+
+  border-radius:17px;
+
+  background:
+    var(--panel);
+
+  border:
+    1px solid var(--border);
+
+  box-shadow:
+    0 30px 100px
+    rgba(0,0,0,.40);
+
+}
+
+.server-menu.show {
+  display:block;
+}
+
+.server-heading {
+
+  padding:
+    5px 7px 10px;
+
+  font-size:13px;
+
+  font-weight:800;
+
+}
+
+.server-option {
+
+  width:100%;
+
+  display:flex;
+  align-items:center;
+
+  gap:10px;
+
+  padding:12px;
+
+  border-radius:11px;
+
+  background:
+    transparent;
+
+  color:var(--text);
+
+  cursor:pointer;
+
+  text-align:left;
+
+}
+
+.server-option:hover {
+
+  background:
+    var(--panel2);
+
+}
+
+.server-option-name {
+  flex:1;
+}
+
+.server-status {
+
+  font-size:10px;
+
+  color:var(--muted);
+
+}
+
+/* =========================================================
+   TABS
+========================================================= */
 
 .tabs {
+
   min-height:42px;
+
   display:flex;
   align-items:end;
+
   gap:5px;
-  padding:0 9px;
-  background:rgba(17,24,39,.82);
-  border-bottom:1px solid var(--border);
+
+  padding:
+    0 9px;
+
   overflow-x:auto;
+
   scrollbar-width:none;
+
+  background:
+    rgba(16,24,39,.82);
+
+  border-bottom:
+    1px solid var(--border);
+
 }
 
 body.light .tabs {
-  background:rgba(255,255,255,.82);
+
+  background:
+    rgba(255,255,255,.82);
+
 }
 
 .tabs::-webkit-scrollbar {
@@ -204,179 +398,327 @@ body.light .tabs {
 }
 
 .tab {
+
   height:37px;
+
   min-width:145px;
   max-width:230px;
-  padding:0 10px;
+
   display:flex;
   align-items:center;
-  gap:7px;
-  border-radius:10px 10px 0 0;
-  color:var(--muted);
-  background:var(--panel2);
+
+  gap:8px;
+
+  padding:
+    0 10px;
+
+  border-radius:
+    10px 10px 0 0;
+
+  background:
+    var(--panel2);
+
+  color:
+    var(--muted);
+
   cursor:pointer;
-  border:1px solid transparent;
+
+  border:
+    1px solid transparent;
+
+  border-bottom:0;
+
 }
 
 .tab.active {
-  background:var(--bg);
-  color:var(--text);
-  border-color:var(--border);
+
+  background:
+    var(--bg);
+
+  color:
+    var(--text);
+
+  border-color:
+    var(--border);
+
 }
 
 .tab-title {
+
   flex:1;
+
   overflow:hidden;
+
   white-space:nowrap;
+
   text-overflow:ellipsis;
+
   font-size:13px;
+
 }
 
-.close {
+.tab-close {
+
   width:22px;
   height:22px;
+
   border-radius:6px;
-  background:transparent;
-  color:var(--muted);
+
+  background:
+    transparent;
+
+  color:
+    var(--muted);
+
   cursor:pointer;
+
 }
 
-.close:hover {
-  background:rgba(148,163,184,.12);
-  color:var(--text);
+.tab-close:hover {
+
+  background:
+    rgba(148,163,184,.12);
+
+  color:
+    var(--text);
+
 }
 
 .new-tab {
+
   width:35px;
   height:35px;
+
   margin-bottom:1px;
+
   border-radius:9px;
-  background:transparent;
-  color:var(--muted);
+
+  background:
+    transparent;
+
+  color:
+    var(--muted);
+
   cursor:pointer;
+
   font-size:22px;
+
 }
 
-/* NAVIGATION */
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 .nav {
+
   display:flex;
   align-items:center;
+
   gap:6px;
-  padding:8px 10px;
-  background:rgba(17,24,39,.82);
-  border-bottom:1px solid var(--border);
+
+  padding:
+    8px 10px;
+
+  background:
+    rgba(16,24,39,.82);
+
+  border-bottom:
+    1px solid var(--border);
+
 }
 
 body.light .nav {
-  background:rgba(255,255,255,.82);
+
+  background:
+    rgba(255,255,255,.82);
+
 }
 
-.nav-btn {
+.nav-button {
+
   width:38px;
   height:38px;
+
   border-radius:10px;
-  background:var(--panel2);
-  color:var(--text);
+
+  background:
+    var(--panel2);
+
+  color:
+    var(--text);
+
+  border:
+    1px solid var(--border);
+
   cursor:pointer;
-  border:1px solid var(--border);
+
   font-size:17px;
+
 }
 
-.nav-btn:disabled {
+.nav-button:disabled {
+
   opacity:.3;
+
   cursor:default;
+
 }
 
 .address-wrap {
+
   flex:1;
+
   position:relative;
+
 }
 
 .address {
+
   width:100%;
+
   height:40px;
-  padding:0 65px 0 42px;
+
+  padding:
+    0 65px 0 42px;
+
   border-radius:20px;
-  border:1px solid var(--border);
+
+  border:
+    1px solid var(--border);
+
   outline:none;
-  color:var(--text);
-  background:rgba(2,6,23,.35);
+
+  background:
+    rgba(2,6,23,.35);
+
+  color:
+    var(--text);
+
 }
 
 body.light .address {
-  background:#f8fafc;
+
+  background:
+    #f8fafc;
+
 }
 
 .address:focus {
-  border-color:var(--accent);
+
+  border-color:
+    var(--accent);
+
   box-shadow:
     0 0 0 3px
     rgba(99,102,241,.12);
+
 }
 
 .lock {
+
   position:absolute;
+
   left:15px;
   top:11px;
+
   opacity:.7;
+
 }
 
 .go {
+
   position:absolute;
+
   right:5px;
   top:5px;
+
   height:30px;
-  padding:0 12px;
+
+  padding:
+    0 13px;
+
   border-radius:15px;
-  color:white;
+
   background:
     linear-gradient(
       135deg,
       var(--accent),
       var(--accent2)
     );
+
+  color:white;
+
   font-size:12px;
+
   font-weight:800;
+
   cursor:pointer;
+
 }
 
-/* INFO */
+/* =========================================================
+   INFO BAR
+========================================================= */
 
 .info {
-  height:30px;
+
+  height:31px;
+
   display:flex;
   align-items:center;
-  gap:18px;
-  padding:0 14px;
-  color:var(--muted);
+
+  gap:19px;
+
+  padding:
+    0 14px;
+
+  background:
+    var(--panel);
+
+  border-bottom:
+    1px solid var(--border);
+
+  color:
+    var(--muted);
+
   font-size:11px;
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
-  white-space:nowrap;
+
   overflow-x:auto;
+
+  white-space:nowrap;
+
 }
 
 .info strong {
   color:var(--text);
 }
 
-.good {
+.green {
   color:var(--green);
 }
 
-/* CONTENT */
+/* =========================================================
+   CONTENT
+========================================================= */
 
 .content {
-  position:relative;
+
   flex:1;
+
   min-height:0;
+
+  position:relative;
+
 }
 
 .page {
+
   position:absolute;
+
   inset:0;
+
   display:none;
+
 }
 
 .page.active {
@@ -384,54 +726,87 @@ body.light .address {
 }
 
 iframe {
+
   width:100%;
   height:100%;
+
   border:0;
+
   background:white;
+
 }
 
-/* HOME */
+/* =========================================================
+   HOME
+========================================================= */
 
 .home {
+
   height:100%;
+
   overflow:auto;
+
   display:flex;
+
   justify-content:center;
-  padding:65px 20px;
+
+  padding:
+    62px 20px;
+
 }
 
 .home-inner {
-  width:min(1050px,100%);
+
+  width:
+    min(1050px,100%);
+
   text-align:center;
+
 }
 
 .hero-icon {
-  width:84px;
-  height:84px;
-  margin:0 auto 20px;
+
+  width:86px;
+  height:86px;
+
   display:grid;
   place-items:center;
-  border-radius:25px;
+
+  margin:
+    0 auto 20px;
+
+  border-radius:26px;
+
   background:
     linear-gradient(
       135deg,
       var(--accent),
       var(--accent2)
     );
+
   box-shadow:
-    0 20px 60px
-    rgba(99,102,241,.3);
-  font-size:36px;
+    0 25px 70px
+    rgba(99,102,241,.32);
+
+  font-size:37px;
+
 }
 
 .hero {
+
   margin:0;
-  font-size:clamp(42px,7vw,74px);
+
+  font-size:
+    clamp(44px,7vw,76px);
+
+  font-weight:950;
+
   letter-spacing:-4px;
-  line-height:.95;
+
 }
 
 .hero span {
+
   background:
     linear-gradient(
       90deg,
@@ -439,119 +814,322 @@ iframe {
       #8b5cf6,
       #ec4899
     );
+
   -webkit-background-clip:text;
   background-clip:text;
+
   color:transparent;
+
 }
 
 .subtitle {
-  max-width:650px;
-  margin:18px auto 30px;
-  color:var(--muted);
-  line-height:1.65;
+
+  max-width:680px;
+
+  margin:
+    18px auto 30px;
+
+  color:
+    var(--muted);
+
+  line-height:1.6;
+
 }
 
 .home-search {
-  width:min(800px,100%);
-  margin:auto;
+
+  width:
+    min(800px,100%);
+
   display:flex;
+
   gap:8px;
+
   padding:7px;
+
+  margin:auto;
+
   border-radius:18px;
-  background:var(--panel);
-  border:1px solid var(--border);
+
+  background:
+    var(--panel);
+
+  border:
+    1px solid var(--border);
+
   box-shadow:
-    0 25px 80px
+    0 30px 90px
     rgba(0,0,0,.25);
+
 }
 
-.home-search input {
+.home-input {
+
   flex:1;
+
   min-width:0;
+
   padding:15px;
+
   border:0;
+
   outline:0;
+
   background:transparent;
+
   color:var(--text);
+
   font-size:16px;
+
 }
 
-.home-search button {
-  padding:0 25px;
+.home-go {
+
+  padding:
+    0 25px;
+
   border-radius:13px;
-  color:white;
-  font-weight:800;
-  cursor:pointer;
+
   background:
     linear-gradient(
       135deg,
       var(--accent),
       var(--accent2)
     );
+
+  color:white;
+
+  font-weight:850;
+
+  cursor:pointer;
+
 }
 
-.section {
+.section-title {
+
   margin-top:38px;
+
   margin-bottom:14px;
-  font-size:12px;
-  font-weight:800;
+
   color:var(--muted);
+
+  font-size:12px;
+
+  font-weight:850;
+
+  letter-spacing:1.2px;
+
   text-transform:uppercase;
-  letter-spacing:1px;
+
 }
 
 .cards {
+
   display:grid;
+
   grid-template-columns:
     repeat(4,1fr);
+
   gap:12px;
+
 }
 
 .card {
+
   text-align:left;
+
   padding:18px;
+
   border-radius:17px;
-  border:1px solid var(--border);
-  background:var(--panel);
-  color:var(--text);
+
+  background:
+    var(--panel);
+
+  border:
+    1px solid var(--border);
+
+  color:
+    var(--text);
+
   cursor:pointer;
+
   transition:
     transform .18s ease,
     border-color .18s ease;
+
 }
 
 .card:hover {
-  transform:translateY(-3px);
-  border-color:var(--accent);
+
+  transform:
+    translateY(-3px);
+
+  border-color:
+    var(--accent);
+
 }
 
 .card-icon {
+
   font-size:25px;
+
   margin-bottom:10px;
+
 }
 
 .card-name {
+
   font-size:14px;
+
   font-weight:850;
+
 }
 
 .card-url {
+
   margin-top:4px;
-  color:var(--muted);
+
+  color:
+    var(--muted);
+
   font-size:11px;
+
 }
 
-/* LOADING */
+/* =========================================================
+   GAME PANEL
+========================================================= */
+
+.game-panel {
+
+  position:fixed;
+
+  bottom:15px;
+  left:15px;
+
+  z-index:4000;
+
+  width:285px;
+
+  display:none;
+
+  padding:15px;
+
+  border-radius:17px;
+
+  background:
+    rgba(15,23,42,.93);
+
+  border:
+    1px solid
+    rgba(255,255,255,.10);
+
+  box-shadow:
+    0 20px 80px
+    rgba(0,0,0,.45);
+
+  backdrop-filter:
+    blur(20px);
+
+}
+
+.game-panel.show {
+  display:block;
+}
+
+.game-title {
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+
+  font-size:14px;
+
+  font-weight:900;
+
+  margin-bottom:12px;
+
+}
+
+.game-dot {
+
+  width:8px;
+  height:8px;
+
+  border-radius:50%;
+
+  background:
+    var(--green);
+
+  box-shadow:
+    0 0 12px
+    rgba(34,197,94,.7);
+
+}
+
+.game-row {
+
+  display:flex;
+
+  justify-content:space-between;
+
+  padding:7px 0;
+
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.06);
+
+  color:#94a3b8;
+
+  font-size:11px;
+
+}
+
+.game-row strong {
+  color:white;
+}
+
+.game-close {
+
+  float:right;
+
+  width:24px;
+  height:24px;
+
+  border-radius:7px;
+
+  background:
+    rgba(255,255,255,.07);
+
+  color:white;
+
+  cursor:pointer;
+
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
 
 .loading {
+
   position:absolute;
+
   inset:0;
-  z-index:1000;
+
+  z-index:3000;
+
   display:none;
+
   place-items:center;
+
   background:
-    rgba(2,6,23,.93);
-  backdrop-filter:blur(15px);
+    rgba(2,6,23,.94);
+
+  backdrop-filter:
+    blur(15px);
+
 }
 
 .loading.show {
@@ -559,58 +1137,103 @@ iframe {
 }
 
 .loading-box {
-  width:min(430px,88%);
+
+  width:
+    min(430px,88%);
+
   padding:30px;
+
   text-align:center;
+
   border-radius:21px;
-  background:#111827;
-  border:1px solid rgba(255,255,255,.08);
+
+  background:
+    #101827;
+
+  border:
+    1px solid
+    rgba(255,255,255,.08);
+
   box-shadow:
     0 30px 100px
-    rgba(0,0,0,.45);
+    rgba(0,0,0,.5);
+
 }
 
 .spinner {
+
   width:58px;
   height:58px;
-  margin:0 auto 18px;
+
+  margin:
+    0 auto 18px;
+
   border-radius:50%;
-  border:4px solid rgba(255,255,255,.08);
-  border-top-color:#8b5cf6;
+
+  border:
+    4px solid
+    rgba(255,255,255,.08);
+
+  border-top-color:
+    #8b5cf6;
+
   animation:
     spin .8s linear infinite;
+
 }
 
 @keyframes spin {
+
   to {
-    transform:rotate(360deg);
+    transform:
+      rotate(360deg);
   }
+
 }
 
 .loading-title {
+
   font-size:21px;
+
   font-weight:900;
+
 }
 
 .loading-url {
+
   margin-top:8px;
+
   color:#94a3b8;
+
   overflow:hidden;
+
   text-overflow:ellipsis;
+
   white-space:nowrap;
+
 }
 
 .progress {
+
   height:5px;
+
   margin-top:22px;
+
   border-radius:999px;
+
   overflow:hidden;
-  background:rgba(255,255,255,.08);
+
+  background:
+    rgba(255,255,255,.08);
+
 }
 
 .progress-bar {
+
   width:35%;
+
   height:100%;
+
   background:
     linear-gradient(
       90deg,
@@ -618,75 +1241,33 @@ iframe {
       #8b5cf6,
       #ec4899
     );
+
   animation:
-    move 1.3s ease-in-out infinite;
+    progress 1.3s ease-in-out infinite;
+
 }
 
-@keyframes move {
+@keyframes progress {
+
   from {
-    transform:translateX(-140%);
+    transform:
+      translateX(-140%);
   }
 
   to {
-    transform:translateX(380%);
+    transform:
+      translateX(380%);
   }
+
 }
 
-/* SERVER MENU */
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 
-.server-menu {
-  position:fixed;
-  top:58px;
-  right:14px;
-  width:300px;
-  padding:12px;
-  display:none;
-  z-index:3000;
-  border-radius:17px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  box-shadow:
-    0 30px 100px
-    rgba(0,0,0,.35);
-}
-
-.server-menu.show {
-  display:block;
-}
-
-.server-title {
-  padding:4px 6px 10px;
-  font-size:14px;
-  font-weight:850;
-}
-
-.server {
-  width:100%;
-  padding:12px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  border-radius:11px;
-  background:transparent;
-  color:var(--text);
-  cursor:pointer;
-  text-align:left;
-}
-
-.server:hover {
-  background:var(--panel2);
-}
-
-.server-name {
-  flex:1;
-}
-
-.server-latency {
-  color:var(--muted);
-  font-size:11px;
-}
-
-@media (max-width:750px) {
+@media (
+  max-width:750px
+) {
 
   .brand,
   .online {
@@ -694,16 +1275,29 @@ iframe {
   }
 
   .cards {
+
     grid-template-columns:
       repeat(2,1fr);
+
   }
 
   .home-search {
+
     flex-direction:column;
+
   }
 
-  .home-search button {
+  .home-go {
+
     height:50px;
+
+  }
+
+  .game-panel {
+
+    width:
+      calc(100% - 30px);
+
   }
 
 }
@@ -716,6 +1310,8 @@ iframe {
 
 <div class="browser">
 
+  <!-- HEADER -->
+
   <header class="header">
 
     <div class="logo">
@@ -727,21 +1323,28 @@ iframe {
     </div>
 
     <div class="online">
+
       <span class="online-dot"></span>
+
       Online
+
     </div>
 
-    <div class="space"></div>
+    <div class="header-space"></div>
 
     <button
       id="serverButton"
       class="server-button"
     >
+
       🌎
+
       <span id="serverName">
         US East
       </span>
+
       ▾
+
     </button>
 
     <button
@@ -754,19 +1357,25 @@ iframe {
   </header>
 
 
+  <!-- SERVER MENU -->
+
   <div
     id="serverMenu"
     class="server-menu"
   >
 
-    <div class="server-title">
+    <div class="server-heading">
       Proxy servers
     </div>
 
-    <div id="serverList"></div>
+    <div
+      id="serverList"
+    ></div>
 
   </div>
 
+
+  <!-- TABS -->
 
   <div
     id="tabs"
@@ -774,32 +1383,34 @@ iframe {
   ></div>
 
 
+  <!-- NAVIGATION -->
+
   <div class="nav">
 
     <button
       id="back"
-      class="nav-btn"
+      class="nav-button"
     >
       ←
     </button>
 
     <button
       id="forward"
-      class="nav-btn"
+      class="nav-button"
     >
       →
     </button>
 
     <button
       id="reload"
-      class="nav-btn"
+      class="nav-button"
     >
       ⟳
     </button>
 
     <button
       id="home"
-      class="nav-btn"
+      class="nav-button"
     >
       ⌂
     </button>
@@ -830,11 +1441,15 @@ iframe {
   </div>
 
 
+  <!-- INFO -->
+
   <div class="info">
 
     <span>
       ⚡ Speed:
-      <strong id="speed">—</strong>
+      <strong id="speed">
+        —
+      </strong>
     </span>
 
     <span>
@@ -845,15 +1460,30 @@ iframe {
     </span>
 
     <span>
+      🎮 Game Mode:
+      <strong
+        id="gameStatus"
+        class="green"
+      >
+        ON
+      </strong>
+    </span>
+
+    <span>
       🌎 Server:
-      <strong id="currentServer">
+      <strong
+        id="currentServer"
+      >
         US East
       </strong>
     </span>
 
     <span>
       ●
-      <strong id="status" class="good">
+      <strong
+        id="status"
+        class="green"
+      >
         Ready
       </strong>
     </span>
@@ -861,11 +1491,15 @@ iframe {
   </div>
 
 
+  <!-- CONTENT -->
+
   <main
     id="content"
     class="content"
   ></main>
 
+
+  <!-- LOADING -->
 
   <div
     id="loading"
@@ -877,19 +1511,104 @@ iframe {
       <div class="spinner"></div>
 
       <div class="loading-title">
-        Connecting
+        Starting Game Mode
       </div>
 
       <div
         id="loadingUrl"
         class="loading-url"
       >
-        Finding fastest proxy...
+        Preparing connection...
       </div>
 
       <div class="progress">
-        <div class="progress-bar"></div>
+
+        <div
+          class="progress-bar"
+        ></div>
+
       </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- GAME PANEL -->
+
+  <div
+    id="gamePanel"
+    class="game-panel"
+  >
+
+    <button
+      id="gameClose"
+      class="game-close"
+    >
+      ×
+    </button>
+
+    <div class="game-title">
+
+      <span class="game-dot"></span>
+
+      🎮 Game Mode
+
+    </div>
+
+    <div class="game-row">
+
+      <span>
+        Runtime
+      </span>
+
+      <strong
+        id="runtimeStatus"
+      >
+        Ready
+      </strong>
+
+    </div>
+
+    <div class="game-row">
+
+      <span>
+        API requests
+      </span>
+
+      <strong
+        id="apiCount"
+      >
+        0
+      </strong>
+
+    </div>
+
+    <div class="game-row">
+
+      <span>
+        WebSockets
+      </span>
+
+      <strong
+        id="wsStatus"
+      >
+        Ready
+      </strong>
+
+    </div>
+
+    <div class="game-row">
+
+      <span>
+        Speed
+      </span>
+
+      <strong
+        id="gameSpeed"
+      >
+        —
+      </strong>
 
     </div>
 
@@ -900,22 +1619,35 @@ iframe {
 
 <script>
 
-/* ========================================================
-   PROXY SERVERS
-
-   You currently have ONE server.
-
-   Add more Render URLs later here.
-======================================================== */
+/* =========================================================
+   SERVERS
+========================================================= */
 
 const SERVERS = [
+
   {
-    name: "US East",
-    flag: "🇺🇸",
-    url: "https://idk-3-89oq.onrender.com"
+    name:
+      "US East",
+
+    flag:
+      "🇺🇸",
+
+    url:
+      "https://idk-3-89oq.onrender.com"
   }
+
 ];
 
+
+/*
+ * Add more later:
+ *
+ * {
+ *   name: "US West",
+ *   flag: "🇺🇸",
+ *   url: "https://your-west.onrender.com"
+ * }
+ */
 
 let selectedServer =
   SERVERS[0];
@@ -925,60 +1657,124 @@ let tabs = [];
 let activeTabId =
   null;
 
-let nextTabId = 1;
+let nextTabId =
+  1;
 
 
-/* ========================================================
+/* =========================================================
    ELEMENTS
-======================================================== */
+========================================================= */
 
 const tabsEl =
-  document.getElementById("tabs");
+  document.getElementById(
+    "tabs"
+  );
 
 const contentEl =
-  document.getElementById("content");
+  document.getElementById(
+    "content"
+  );
 
 const addressEl =
-  document.getElementById("address");
+  document.getElementById(
+    "address"
+  );
 
 const loadingEl =
-  document.getElementById("loading");
+  document.getElementById(
+    "loading"
+  );
 
 const loadingUrlEl =
-  document.getElementById("loadingUrl");
+  document.getElementById(
+    "loadingUrl"
+  );
 
 const speedEl =
-  document.getElementById("speed");
+  document.getElementById(
+    "speed"
+  );
 
 const cacheEl =
-  document.getElementById("cache");
+  document.getElementById(
+    "cache"
+  );
 
 const statusEl =
-  document.getElementById("status");
+  document.getElementById(
+    "status"
+  );
 
-const serverNameEl =
-  document.getElementById("serverName");
+const serverButton =
+  document.getElementById(
+    "serverButton"
+  );
 
-const currentServerEl =
-  document.getElementById("currentServer");
+const serverMenu =
+  document.getElementById(
+    "serverMenu"
+  );
 
-const serverMenuEl =
-  document.getElementById("serverMenu");
+const serverList =
+  document.getElementById(
+    "serverList"
+  );
 
-const serverListEl =
-  document.getElementById("serverList");
+const serverName =
+  document.getElementById(
+    "serverName"
+  );
+
+const currentServer =
+  document.getElementById(
+    "currentServer"
+  );
+
+const gameStatus =
+  document.getElementById(
+    "gameStatus"
+  );
+
+const gamePanel =
+  document.getElementById(
+    "gamePanel"
+  );
+
+const runtimeStatus =
+  document.getElementById(
+    "runtimeStatus"
+  );
+
+const apiCount =
+  document.getElementById(
+    "apiCount"
+  );
+
+const wsStatus =
+  document.getElementById(
+    "wsStatus"
+  );
+
+const gameSpeed =
+  document.getElementById(
+    "gameSpeed"
+  );
 
 
-/* ========================================================
+let apiRequests =
+  0;
+
+
+/* =========================================================
    SERVER UI
-======================================================== */
+========================================================= */
 
 function updateServerUI() {
 
-  serverNameEl.textContent =
+  serverName.textContent =
     selectedServer.name;
 
-  currentServerEl.textContent =
+  currentServer.textContent =
     selectedServer.name;
 
 }
@@ -986,74 +1782,87 @@ function updateServerUI() {
 
 function renderServers() {
 
-  serverListEl.innerHTML = "";
+  serverList.innerHTML =
+    "";
 
-  SERVERS.forEach(server => {
+  SERVERS.forEach(
+    server => {
 
-    const button =
-      document.createElement("button");
+      const button =
+        document.createElement(
+          "button"
+        );
 
-    button.className =
-      "server";
+      button.className =
+        "server-option";
 
-    button.innerHTML = `
-      <span>
-        ${server.flag}
-      </span>
+      button.innerHTML = `
 
-      <span class="server-name">
-        ${server.name}
-      </span>
+        <span>
+          ${server.flag}
+        </span>
 
-      <span class="server-latency">
-        Online
-      </span>
-    `;
+        <span class="server-option-name">
+          ${server.name}
+        </span>
 
-    button.onclick = () => {
+        <span class="server-status">
+          Online
+        </span>
 
-      selectedServer =
-        server;
+      `;
 
-      updateServerUI();
+      button.onclick =
+        () => {
 
-      serverMenuEl.classList.remove(
-        "show"
+          selectedServer =
+            server;
+
+          updateServerUI();
+
+          serverMenu.classList.remove(
+            "show"
+          );
+
+        };
+
+      serverList.appendChild(
+        button
       );
 
-    };
-
-    serverListEl.appendChild(
-      button
-    );
-
-  });
-
-}
-
-
-/* ========================================================
-   PROXY URL
-======================================================== */
-
-function proxyUrl(url) {
-
-  return (
-    selectedServer.url +
-    "/proxy?url=" +
-    encodeURIComponent(url)
+    }
   );
 
 }
 
 
-/* ========================================================
-   HOME
-======================================================== */
+/* =========================================================
+   PROXY URL
+========================================================= */
 
-function getHomeHTML() {
+function buildProxyUrl(
+  url
+) {
+
+  return (
+    selectedServer.url +
+    "/proxy?url=" +
+    encodeURIComponent(
+      url
+    )
+  );
+
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function homeHTML() {
 
   return `
+
     <div class="home">
 
       <div class="home-inner">
@@ -1067,27 +1876,32 @@ function getHomeHTML() {
         </h1>
 
         <p class="subtitle">
-          A premium browser-style proxy with
-          smart caching, multiple proxy servers,
-          tabs and live performance information.
+
+          Game Mode is active.
+          FastProxy rewrites game networking,
+          supports API traffic and WebSockets,
+          and caches smaller game resources.
+
         </p>
 
         <div class="home-search">
 
           <input
             class="home-input"
-            placeholder="Enter a website..."
+            placeholder="Enter a game website..."
             autocomplete="off"
             spellcheck="false"
           >
 
-          <button class="home-go">
-            Browse →
+          <button
+            class="home-go"
+          >
+            Launch →
           </button>
 
         </div>
 
-        <div class="section">
+        <div class="section-title">
           Quick launch
         </div>
 
@@ -1097,6 +1911,7 @@ function getHomeHTML() {
             class="card"
             data-url="https://example.com"
           >
+
             <div class="card-icon">
               🌐
             </div>
@@ -1108,42 +1923,7 @@ function getHomeHTML() {
             <div class="card-url">
               example.com
             </div>
-          </button>
 
-
-          <button
-            class="card"
-            data-url="https://www.google.com"
-          >
-            <div class="card-icon">
-              🔎
-            </div>
-
-            <div class="card-name">
-              Google
-            </div>
-
-            <div class="card-url">
-              google.com
-            </div>
-          </button>
-
-
-          <button
-            class="card"
-            data-url="https://www.wikipedia.org"
-          >
-            <div class="card-icon">
-              📚
-            </div>
-
-            <div class="card-name">
-              Wikipedia
-            </div>
-
-            <div class="card-url">
-              wikipedia.org
-            </div>
           </button>
 
 
@@ -1151,6 +1931,7 @@ function getHomeHTML() {
             class="card"
             data-url="https://www.poki.com"
           >
+
             <div class="card-icon">
               🎮
             </div>
@@ -1162,6 +1943,47 @@ function getHomeHTML() {
             <div class="card-url">
               poki.com
             </div>
+
+          </button>
+
+
+          <button
+            class="card"
+            data-url="https://www.google.com"
+          >
+
+            <div class="card-icon">
+              🔎
+            </div>
+
+            <div class="card-name">
+              Google
+            </div>
+
+            <div class="card-url">
+              google.com
+            </div>
+
+          </button>
+
+
+          <button
+            class="card"
+            data-url="https://www.wikipedia.org"
+          >
+
+            <div class="card-icon">
+              📚
+            </div>
+
+            <div class="card-name">
+              Wikipedia
+            </div>
+
+            <div class="card-url">
+              wikipedia.org
+            </div>
+
           </button>
 
         </div>
@@ -1169,28 +1991,34 @@ function getHomeHTML() {
       </div>
 
     </div>
+
   `;
 
 }
 
 
-/* ========================================================
+/* =========================================================
    CREATE TAB
-======================================================== */
+========================================================= */
 
 function createTab() {
 
   const id =
     nextTabId++;
 
+
   const page =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   page.className =
     "page";
 
+
   page.innerHTML =
-    getHomeHTML();
+    homeHTML();
+
 
   contentEl.appendChild(
     page
@@ -1216,9 +2044,6 @@ function createTab() {
     page,
 
     iframe:
-      null,
-
-    start:
       null
 
   };
@@ -1236,35 +2061,39 @@ function createTab() {
 
   renderTabs();
 
-  switchTab(id);
-
-  return tab;
-
-}
-
-
-/* ========================================================
-   GET ACTIVE TAB
-======================================================== */
-
-function getActiveTab() {
-
-  return tabs.find(
-    tab =>
-      tab.id === activeTabId
+  switchTab(
+    id
   );
 
 }
 
 
-/* ========================================================
-   NAVIGATE
-======================================================== */
+/* =========================================================
+   ACTIVE TAB
+========================================================= */
 
-function navigate(rawUrl) {
+function getActiveTab() {
+
+  return tabs.find(
+    tab =>
+      tab.id ===
+      activeTabId
+  );
+
+}
+
+
+/* =========================================================
+   NAVIGATE
+========================================================= */
+
+function navigate(
+  raw
+) {
 
   let url =
-    rawUrl.trim();
+    raw.trim();
+
 
   if (!url) {
     return;
@@ -1272,11 +2101,14 @@ function navigate(rawUrl) {
 
 
   if (
-    !/^https?:\/\//i.test(url)
+    !/^https?:\/\//i.test(
+      url
+    )
   ) {
 
     url =
-      "https://" + url;
+      "https://" +
+      url;
 
   }
 
@@ -1284,7 +2116,9 @@ function navigate(rawUrl) {
   try {
 
     url =
-      new URL(url).href;
+      new URL(
+        url
+      ).href;
 
   } catch {
 
@@ -1299,12 +2133,27 @@ function navigate(rawUrl) {
   const tab =
     getActiveTab();
 
+
   if (!tab) {
     return;
   }
 
 
-  showLoading(url);
+  loadingEl.classList.add(
+    "show"
+  );
+
+
+  loadingUrlEl.textContent =
+    url;
+
+
+  statusEl.textContent =
+    "Connecting";
+
+
+  speedEl.textContent =
+    "Loading";
 
 
   const start =
@@ -1318,11 +2167,17 @@ function navigate(rawUrl) {
 
 
   iframe.src =
-    proxyUrl(url);
+    buildProxyUrl(
+      url
+    );
 
 
-  iframe.loading =
-    "eager";
+  iframe.allow =
+    "autoplay; fullscreen; gamepad; microphone; camera; clipboard-read; clipboard-write";
+
+
+  iframe.allowFullscreen =
+    true;
 
 
   iframe.addEventListener(
@@ -1334,11 +2189,24 @@ function navigate(rawUrl) {
         start;
 
 
-      speedEl.textContent =
+      const display =
         elapsed < 1000
-          ? Math.round(elapsed) + " ms"
-          : (elapsed / 1000).toFixed(2) +
+          ? Math.round(
+              elapsed
+            ) +
+            " ms"
+          :
+            (
+              elapsed / 1000
+            ).toFixed(2) +
             " s";
+
+
+      speedEl.textContent =
+        display;
+
+      gameSpeed.textContent =
+        display;
 
 
       loadingEl.classList.remove(
@@ -1346,12 +2214,36 @@ function navigate(rawUrl) {
       );
 
 
+      statusEl.textContent =
+        "Loaded";
+
+
       cacheEl.textContent =
         "Active";
 
 
+      runtimeStatus.textContent =
+        "Running";
+
+
+      gamePanel.classList.add(
+        "show"
+      );
+
+    }
+  );
+
+
+  iframe.addEventListener(
+    "error",
+    () => {
+
+      loadingEl.classList.remove(
+        "show"
+      );
+
       statusEl.textContent =
-        "Loaded";
+        "Error";
 
     }
   );
@@ -1372,8 +2264,14 @@ function navigate(rawUrl) {
     url;
 
   tab.title =
-    getDomain(url);
+    getDomain(
+      url
+    );
 
+
+  /*
+   * History
+   */
 
   tab.history =
     tab.history.slice(
@@ -1400,77 +2298,9 @@ function navigate(rawUrl) {
 }
 
 
-/* ========================================================
-   LOADING
-======================================================== */
-
-function showLoading(url) {
-
-  loadingUrlEl.textContent =
-    url;
-
-  loadingEl.classList.add(
-    "show"
-  );
-
-  statusEl.textContent =
-    "Loading";
-
-  speedEl.textContent =
-    "Loading...";
-
-}
-
-
-/* ========================================================
-   SWITCH TAB
-======================================================== */
-
-function switchTab(id) {
-
-  activeTabId =
-    id;
-
-
-  tabs.forEach(tab => {
-
-    tab.page.classList.toggle(
-      "active",
-      tab.id === id
-    );
-
-  });
-
-
-  renderTabs();
-
-  updateAddress();
-
-  updateNavigation();
-
-
-  const tab =
-    getActiveTab();
-
-
-  if (tab && tab.url) {
-
-    statusEl.textContent =
-      "Ready";
-
-  } else {
-
-    statusEl.textContent =
-      "Home";
-
-  }
-
-}
-
-
-/* ========================================================
-   RENDER TABS
-======================================================== */
+/* =========================================================
+   TAB RENDER
+========================================================= */
 
 function renderTabs() {
 
@@ -1478,74 +2308,85 @@ function renderTabs() {
     "";
 
 
-  tabs.forEach(tab => {
+  tabs.forEach(
+    tab => {
 
-    const element =
-      document.createElement(
-        "div"
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "tab" +
+        (
+          tab.id ===
+          activeTabId
+            ? " active"
+            : ""
+        );
+
+
+      const title =
+        document.createElement(
+          "div"
+        );
+
+      title.className =
+        "tab-title";
+
+      title.textContent =
+        tab.title;
+
+
+      const close =
+        document.createElement(
+          "button"
+        );
+
+      close.className =
+        "tab-close";
+
+      close.textContent =
+        "×";
+
+
+      close.onclick =
+        event => {
+
+          event.stopPropagation();
+
+          closeTab(
+            tab.id
+          );
+
+        };
+
+
+      item.appendChild(
+        title
       );
 
-    element.className =
-      "tab" +
-      (
-        tab.id === activeTabId
-          ? " active"
-          : ""
+      item.appendChild(
+        close
       );
 
 
-    const title =
-      document.createElement(
-        "div"
+      item.onclick =
+        () => {
+
+          switchTab(
+            tab.id
+          );
+
+        };
+
+
+      tabsEl.appendChild(
+        item
       );
 
-    title.className =
-      "tab-title";
-
-    title.textContent =
-      tab.title;
-
-
-    const close =
-      document.createElement(
-        "button"
-      );
-
-    close.className =
-      "close";
-
-    close.textContent =
-      "×";
-
-
-    close.onclick = event => {
-
-      event.stopPropagation();
-
-      closeTab(tab.id);
-
-    };
-
-
-    element.appendChild(
-      title
-    );
-
-    element.appendChild(
-      close
-    );
-
-
-    element.onclick =
-      () =>
-        switchTab(tab.id);
-
-
-    tabsEl.appendChild(
-      element
-    );
-
-  });
+    }
+  );
 
 
   const plus =
@@ -1559,8 +2400,9 @@ function renderTabs() {
   plus.textContent =
     "+";
 
+
   plus.onclick =
-    () => createTab();
+    createTab;
 
 
   tabsEl.appendChild(
@@ -1570,11 +2412,70 @@ function renderTabs() {
 }
 
 
-/* ========================================================
-   CLOSE TAB
-======================================================== */
+/* =========================================================
+   SWITCH TAB
+========================================================= */
 
-function closeTab(id) {
+function switchTab(
+  id
+) {
+
+  activeTabId =
+    id;
+
+
+  tabs.forEach(
+    tab => {
+
+      tab.page.classList.toggle(
+        "active",
+        tab.id === id
+      );
+
+    }
+  );
+
+
+  updateAddress();
+
+  updateNavigation();
+
+  renderTabs();
+
+
+  const tab =
+    getActiveTab();
+
+
+  if (
+    tab &&
+    tab.url
+  ) {
+
+    statusEl.textContent =
+      "Ready";
+
+  } else {
+
+    statusEl.textContent =
+      "Home";
+
+    gamePanel.classList.remove(
+      "show"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CLOSE TAB
+========================================================= */
+
+function closeTab(
+  id
+) {
 
   const index =
     tabs.findIndex(
@@ -1605,7 +2506,9 @@ function closeTab(id) {
   }
 
 
-  if (activeTabId === id) {
+  if (
+    activeTabId === id
+  ) {
 
     const newIndex =
       Math.max(
@@ -1615,7 +2518,9 @@ function closeTab(id) {
 
 
     activeTabId =
-      tabs[newIndex].id;
+      tabs[
+        newIndex
+      ].id;
 
   }
 
@@ -1629,9 +2534,9 @@ function closeTab(id) {
 }
 
 
-/* ========================================================
-   ADDRESS
-======================================================== */
+/* =========================================================
+   ADDRESS BAR
+========================================================= */
 
 function updateAddress() {
 
@@ -1647,9 +2552,9 @@ function updateAddress() {
 }
 
 
-/* ========================================================
+/* =========================================================
    HISTORY
-======================================================== */
+========================================================= */
 
 function updateNavigation() {
 
@@ -1677,232 +2582,171 @@ function updateNavigation() {
 }
 
 
-function loadHistory(
-  tab,
-  url
-) {
-
-  showLoading(url);
-
-
-  const iframe =
-    document.createElement(
-      "iframe"
-    );
-
-
-  iframe.src =
-    proxyUrl(url);
-
-
-  const start =
-    performance.now();
-
-
-  iframe.addEventListener(
-    "load",
-    () => {
-
-      const elapsed =
-        performance.now() -
-        start;
-
-
-      speedEl.textContent =
-        elapsed < 1000
-          ? Math.round(elapsed) +
-            " ms"
-          : (elapsed / 1000).toFixed(2) +
-            " s";
-
-
-      loadingEl.classList.remove(
-        "show"
-      );
-
-      statusEl.textContent =
-        "Loaded";
-
-    }
-  );
-
-
-  tab.page.innerHTML =
-    "";
-
-  tab.page.appendChild(
-    iframe
-  );
-
-  tab.iframe =
-    iframe;
-
-  tab.url =
-    url;
-
-  tab.title =
-    getDomain(url);
-
-
-  updateAddress();
-
-  updateNavigation();
-
-}
-
-
 document.getElementById(
   "back"
-).onclick = () => {
+).onclick =
+  () => {
 
-  const tab =
-    getActiveTab();
-
-
-  if (
-    !tab ||
-    tab.historyIndex <= 0
-  ) {
-    return;
-  }
+    const tab =
+      getActiveTab();
 
 
-  tab.historyIndex--;
+    if (
+      !tab ||
+      tab.historyIndex <= 0
+    ) {
+      return;
+    }
 
 
-  loadHistory(
-    tab,
-    tab.history[
-      tab.historyIndex
-    ]
-  );
+    tab.historyIndex--;
 
-};
+
+    navigate(
+      tab.history[
+        tab.historyIndex
+      ]
+    );
+
+  };
 
 
 document.getElementById(
   "forward"
-).onclick = () => {
+).onclick =
+  () => {
 
-  const tab =
-    getActiveTab();
-
-
-  if (
-    !tab ||
-    tab.historyIndex >=
-      tab.history.length - 1
-  ) {
-    return;
-  }
+    const tab =
+      getActiveTab();
 
 
-  tab.historyIndex++;
+    if (
+      !tab ||
+      tab.historyIndex >=
+        tab.history.length - 1
+    ) {
+      return;
+    }
 
 
-  loadHistory(
-    tab,
-    tab.history[
-      tab.historyIndex
-    ]
-  );
-
-};
+    tab.historyIndex++;
 
 
-/* ========================================================
-   HOME / RELOAD
-======================================================== */
+    navigate(
+      tab.history[
+        tab.historyIndex
+      ]
+    );
 
-document.getElementById(
-  "home"
-).onclick = () => {
-
-  const tab =
-    getActiveTab();
+  };
 
 
-  if (!tab) {
-    return;
-  }
-
-
-  tab.url =
-    null;
-
-  tab.title =
-    "New Tab";
-
-  tab.history =
-    [];
-
-  tab.historyIndex =
-    -1;
-
-  tab.page.innerHTML =
-    getHomeHTML();
-
-  tab.iframe =
-    null;
-
-
-  attachHomeEvents(
-    tab.page
-  );
-
-
-  renderTabs();
-
-  updateAddress();
-
-  updateNavigation();
-
-
-  speedEl.textContent =
-    "—";
-
-  cacheEl.textContent =
-    "Ready";
-
-  statusEl.textContent =
-    "Home";
-
-};
-
+/* =========================================================
+   RELOAD
+========================================================= */
 
 document.getElementById(
   "reload"
-).onclick = () => {
+).onclick =
+  () => {
 
-  const tab =
-    getActiveTab();
-
-
-  if (!tab || !tab.url) {
-    return;
-  }
+    const tab =
+      getActiveTab();
 
 
-  navigate(
-    tab.url
-  );
+    if (
+      tab &&
+      tab.url
+    ) {
 
-};
+      navigate(
+        tab.url
+      );
+
+    }
+
+  };
 
 
-/* ========================================================
-   ADDRESS BAR
-======================================================== */
+/* =========================================================
+   HOME
+========================================================= */
+
+document.getElementById(
+  "home"
+).onclick =
+  () => {
+
+    const tab =
+      getActiveTab();
+
+
+    if (!tab) {
+      return;
+    }
+
+
+    tab.url =
+      null;
+
+    tab.title =
+      "New Tab";
+
+    tab.history =
+      [];
+
+    tab.historyIndex =
+      -1;
+
+    tab.page.innerHTML =
+      homeHTML();
+
+    tab.iframe =
+      null;
+
+
+    attachHomeEvents(
+      tab.page
+    );
+
+
+    updateAddress();
+
+    updateNavigation();
+
+    renderTabs();
+
+
+    speedEl.textContent =
+      "—";
+
+    cacheEl.textContent =
+      "Ready";
+
+    statusEl.textContent =
+      "Home";
+
+    gamePanel.classList.remove(
+      "show"
+    );
+
+  };
+
+
+/* =========================================================
+   ADDRESS ENTER
+========================================================= */
 
 document.getElementById(
   "go"
-).onclick = () => {
+).onclick =
+  () => {
 
-  navigate(
-    addressEl.value
-  );
+    navigate(
+      addressEl.value
+    );
 
-};
+  };
 
 
 addressEl.addEventListener(
@@ -1910,7 +2754,8 @@ addressEl.addEventListener(
   event => {
 
     if (
-      event.key === "Enter"
+      event.key ===
+      "Enter"
     ) {
 
       navigate(
@@ -1923,9 +2768,9 @@ addressEl.addEventListener(
 );
 
 
-/* ========================================================
+/* =========================================================
    HOME EVENTS
-======================================================== */
+========================================================= */
 
 function attachHomeEvents(
   page
@@ -1942,13 +2787,19 @@ function attachHomeEvents(
     );
 
 
-  if (input && button) {
+  if (
+    input &&
+    button
+  ) {
 
     button.onclick =
-      () =>
+      () => {
+
         navigate(
           input.value
         );
+
+      };
 
 
     input.addEventListener(
@@ -1956,7 +2807,8 @@ function attachHomeEvents(
       event => {
 
         if (
-          event.key === "Enter"
+          event.key ===
+          "Enter"
         ) {
 
           navigate(
@@ -1975,22 +2827,144 @@ function attachHomeEvents(
     .querySelectorAll(
       ".card"
     )
-    .forEach(card => {
+    .forEach(
+      card => {
 
-      card.onclick =
-        () =>
-          navigate(
-            card.dataset.url
-          );
+        card.onclick =
+          () => {
 
-    });
+            navigate(
+              card.dataset.url
+            );
+
+          };
+
+      }
+    );
 
 }
 
 
-/* ========================================================
+/* =========================================================
+   GAME EVENTS
+========================================================= */
+
+window.addEventListener(
+  "message",
+  event => {
+
+    const data =
+      event.data;
+
+
+    if (
+      !data ||
+      data.source !==
+        "fastproxy"
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      data.type ===
+      "runtime-ready"
+    ) {
+
+      runtimeStatus.textContent =
+        "Ready";
+
+      gameStatus.textContent =
+        "ON";
+
+    }
+
+
+    if (
+      data.type ===
+      "fetch" ||
+      data.type ===
+      "xhr" ||
+      data.type ===
+      "request" ||
+      data.type ===
+      "beacon"
+    ) {
+
+      apiRequests++;
+
+      apiCount.textContent =
+        apiRequests;
+
+    }
+
+
+    if (
+      data.type ===
+      "websocket"
+    ) {
+
+      wsStatus.textContent =
+        "Connecting";
+
+      setTimeout(
+        () => {
+
+          wsStatus.textContent =
+            "Active";
+
+        },
+        600
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   SERVER MENU
+========================================================= */
+
+serverButton.onclick =
+  () => {
+
+    serverMenu.classList.toggle(
+      "show"
+    );
+
+  };
+
+
+document.addEventListener(
+  "click",
+  event => {
+
+    if (
+      !serverMenu.contains(
+        event.target
+      ) &&
+      !serverButton.contains(
+        event.target
+      )
+    ) {
+
+      serverMenu.classList.remove(
+        "show"
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
    THEME
-======================================================== */
+========================================================= */
 
 const themeButton =
   document.getElementById(
@@ -2005,7 +2979,8 @@ const savedTheme =
 
 
 if (
-  savedTheme === "light"
+  savedTheme ===
+  "light"
 ) {
 
   document.body.classList.add(
@@ -2043,114 +3018,38 @@ themeButton.onclick =
   };
 
 
-/* ========================================================
-   SERVER MENU
-======================================================== */
+/* =========================================================
+   GAME PANEL
+========================================================= */
 
 document.getElementById(
-  "serverButton"
-).onclick = () => {
+  "gameClose"
+).onclick =
+  () => {
 
-  serverMenuEl.classList.toggle(
-    "show"
-  );
-
-};
-
-
-function selectFastestServer() {
-
-  if (
-    SERVERS.length === 1
-  ) {
-
-    selectedServer =
-      SERVERS[0];
-
-    updateServerUI();
-
-    renderServers();
-
-    return;
-
-  }
-
-
-  Promise.all(
-    SERVERS.map(
-      async server => {
-
-        const start =
-          performance.now();
-
-        try {
-
-          await fetch(
-            server.url +
-            "/health",
-            {
-              cache:
-                "no-store"
-            }
-          );
-
-
-          return {
-            server,
-            latency:
-              performance.now() -
-              start
-          };
-
-        } catch {
-
-          return {
-            server,
-            latency:
-              Infinity
-          };
-
-        }
-
-      }
-    )
-  ).then(results => {
-
-    results.sort(
-      (a,b) =>
-        a.latency -
-        b.latency
+    gamePanel.classList.remove(
+      "show"
     );
 
-
-    selectedServer =
-      results[0].server;
+  };
 
 
-    updateServerUI();
-
-
-    renderServers();
-
-  });
-
-}
-
-
-/* ========================================================
+/* =========================================================
    DOMAIN
-======================================================== */
+========================================================= */
 
-function getDomain(url) {
+function getDomain(
+  url
+) {
 
   try {
 
-    return new URL(url)
-      .hostname
-      .replace(
-        /^www\./,
-        ""
-      );
+    return new URL(
+      url
+    ).hostname.replace(
+      /^www\./,
+      ""
+    );
 
   } catch {
 
@@ -2161,15 +3060,13 @@ function getDomain(url) {
 }
 
 
-/* ========================================================
+/* =========================================================
    START
-======================================================== */
+========================================================= */
 
 updateServerUI();
 
 renderServers();
-
-selectFastestServer();
 
 createTab();
 
