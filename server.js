@@ -9,9 +9,11 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* =========================================
-   BASIC SETUP
-========================================= */
+/* =========================================================
+   APP SETUP
+========================================================= */
+
+app.disable("x-powered-by");
 
 app.use(compression());
 
@@ -21,13 +23,16 @@ app.use(
   })
 );
 
-/* =========================================
+/* =========================================================
    CACHE
-========================================= */
+========================================================= */
 
 const cache = new Map();
 
 const MAX_CACHE_ITEMS = 300;
+
+const HTML_CACHE_TIME = 30 * 1000;
+const ASSET_CACHE_TIME = 5 * 60 * 1000;
 
 function getCache(key) {
   const item = cache.get(key);
@@ -36,7 +41,7 @@ function getCache(key) {
     return null;
   }
 
-  if (item.expires < Date.now()) {
+  if (item.expires <= Date.now()) {
     cache.delete(key);
     return null;
   }
@@ -60,9 +65,9 @@ function setCache(key, data, contentType, ttl) {
   });
 }
 
-/* =========================================
-   HOST SAFETY
-========================================= */
+/* =========================================================
+   SSRF / LOCAL HOST PROTECTION
+========================================================= */
 
 function isPrivateIPv4(ip) {
   const parts = ip.split(".").map(Number);
@@ -155,31 +160,29 @@ async function validateUrl(rawUrl) {
     url.protocol !== "https:"
   ) {
     throw new Error(
-      "Only HTTP and HTTPS URLs are allowed."
+      "Only HTTP and HTTPS URLs are supported."
     );
   }
 
-  const safe = await isSafeHost(
-    url.hostname
-  );
+  const safe = await isSafeHost(url.hostname);
 
   if (!safe) {
     throw new Error(
-      "That host is not allowed."
+      "That website is not allowed."
     );
   }
 
   return url;
 }
 
-/* =========================================
+/* =========================================================
    HELPERS
-========================================= */
+========================================================= */
 
-function proxyUrl(target) {
+function makeProxyUrl(url) {
   return (
     "/proxy?url=" +
-    encodeURIComponent(target)
+    encodeURIComponent(url)
   );
 }
 
@@ -192,231 +195,307 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
-/* =========================================
-   HTML REWRITING
-========================================= */
+function resolveUrl(value, baseUrl) {
+  try {
+    return new URL(value, baseUrl).href;
+  } catch {
+    return null;
+  }
+}
+
+/* =========================================================
+   REWRITE HTML
+========================================================= */
 
 function rewriteHtml(html, baseUrl) {
   const $ = cheerio.load(html, {
     decodeEntities: false
   });
 
+  /*
+   * Remove <base> so the browser doesn't bypass
+   * the rewritten URLs.
+   */
   $("base").remove();
 
-  /* Links */
+  /* -------------------------------------------------------
+     LINKS
+  ------------------------------------------------------- */
 
-  $("a[href]").each((_, el) => {
-    const href = $(el).attr("href");
+  $("a[href]").each((_, element) => {
+    const value = $(element).attr("href");
 
-    if (!href) {
-      return;
-    }
+    if (!value) return;
 
     if (
-      href.startsWith("#") ||
-      href.startsWith("mailto:") ||
-      href.startsWith("tel:") ||
-      href.startsWith("javascript:")
+      value.startsWith("#") ||
+      value.startsWith("mailto:") ||
+      value.startsWith("tel:") ||
+      value.startsWith("javascript:") ||
+      value.startsWith("data:")
     ) {
       return;
     }
 
-    try {
-      const absolute = new URL(
-        href,
-        baseUrl
-      ).href;
+    const absolute = resolveUrl(
+      value,
+      baseUrl
+    );
 
-      $(el).attr(
+    if (absolute) {
+      $(element).attr(
         "href",
-        proxyUrl(absolute)
+        makeProxyUrl(absolute)
       );
-    } catch {}
+    }
   });
 
-  /* Forms */
+  /* -------------------------------------------------------
+     FORMS
+  ------------------------------------------------------- */
 
-  $("form[action]").each((_, el) => {
-    const action = $(el).attr("action");
+  $("form[action]").each((_, element) => {
+    const value = $(element).attr("action");
 
-    if (!action) {
-      return;
-    }
+    if (!value) return;
 
-    try {
-      const absolute = new URL(
-        action,
-        baseUrl
-      ).href;
+    const absolute = resolveUrl(
+      value,
+      baseUrl
+    );
 
-      $(el).attr(
+    if (absolute) {
+      $(element).attr(
         "action",
-        proxyUrl(absolute)
+        makeProxyUrl(absolute)
       );
-    } catch {}
+    }
   });
 
-  /* Images */
+  /* -------------------------------------------------------
+     IMAGES
+  ------------------------------------------------------- */
 
-  $("img[src]").each((_, el) => {
-    const src = $(el).attr("src");
+  $(
+    "img[src], image[href], image[xlink\\:href]"
+  ).each((_, element) => {
 
-    if (!src) {
+    const attribute =
+      $(element).attr("src") !== undefined
+        ? "src"
+        : $(element).attr("href") !== undefined
+          ? "href"
+          : "xlink:href";
+
+    const value =
+      $(element).attr(attribute);
+
+    if (!value) return;
+
+    if (
+      value.startsWith("data:") ||
+      value.startsWith("blob:")
+    ) {
       return;
     }
 
-    try {
-      const absolute = new URL(
-        src,
-        baseUrl
-      ).href;
+    const absolute = resolveUrl(
+      value,
+      baseUrl
+    );
 
-      $(el).attr(
+    if (absolute) {
+      $(element).attr(
+        attribute,
+        makeProxyUrl(absolute)
+      );
+    }
+  });
+
+  /* -------------------------------------------------------
+     SCRIPTS
+  ------------------------------------------------------- */
+
+  $("script[src]").each((_, element) => {
+    const value = $(element).attr("src");
+
+    if (!value) return;
+
+    const absolute = resolveUrl(
+      value,
+      baseUrl
+    );
+
+    if (absolute) {
+      $(element).attr(
         "src",
-        proxyUrl(absolute)
+        makeProxyUrl(absolute)
       );
-    } catch {}
+    }
   });
 
-  /* Scripts */
+  /* -------------------------------------------------------
+     STYLESHEETS / FAVICONS
+  ------------------------------------------------------- */
 
-  $("script[src]").each((_, el) => {
-    const src = $(el).attr("src");
+  $("link[href]").each((_, element) => {
+    const value = $(element).attr("href");
 
-    if (!src) {
-      return;
-    }
+    if (!value) return;
 
-    try {
-      const absolute = new URL(
-        src,
-        baseUrl
-      ).href;
+    const absolute = resolveUrl(
+      value,
+      baseUrl
+    );
 
-      $(el).attr(
-        "src",
-        proxyUrl(absolute)
-      );
-    } catch {}
-  });
-
-  /* Stylesheets */
-
-  $("link[href]").each((_, el) => {
-    const href = $(el).attr("href");
-
-    if (!href) {
-      return;
-    }
-
-    try {
-      const absolute = new URL(
-        href,
-        baseUrl
-      ).href;
-
-      $(el).attr(
+    if (absolute) {
+      $(element).attr(
         "href",
-        proxyUrl(absolute)
+        makeProxyUrl(absolute)
       );
-    } catch {}
+    }
   });
 
-  /* Videos */
+  /* -------------------------------------------------------
+     VIDEO / AUDIO / SOURCE
+  ------------------------------------------------------- */
 
-  $("video[src], source[src]").each(
-    (_, el) => {
-      const src = $(el).attr("src");
+  $(
+    "video[src], audio[src], source[src], track[src]"
+  ).each((_, element) => {
 
-      if (!src) {
-        return;
-      }
+    const value = $(element).attr("src");
 
-      try {
-        const absolute = new URL(
-          src,
-          baseUrl
-        ).href;
+    if (!value) return;
 
-        $(el).attr(
-          "src",
-          proxyUrl(absolute)
-        );
-      } catch {}
+    const absolute = resolveUrl(
+      value,
+      baseUrl
+    );
+
+    if (absolute) {
+      $(element).attr(
+        "src",
+        makeProxyUrl(absolute)
+      );
     }
-  );
+  });
 
-  /* srcset */
+  /* -------------------------------------------------------
+     OBJECT / EMBED
+  ------------------------------------------------------- */
 
-  $("[srcset]").each((_, el) => {
-    const srcset =
-      $(el).attr("srcset");
+  $(
+    "object[data], embed[src]"
+  ).each((_, element) => {
 
-    if (!srcset) {
-      return;
+    const attribute =
+      $(element).attr("data") !== undefined
+        ? "data"
+        : "src";
+
+    const value =
+      $(element).attr(attribute);
+
+    if (!value) return;
+
+    const absolute = resolveUrl(
+      value,
+      baseUrl
+    );
+
+    if (absolute) {
+      $(element).attr(
+        attribute,
+        makeProxyUrl(absolute)
+      );
     }
+  });
 
-    const rewritten = srcset
+  /* -------------------------------------------------------
+     SRCSET
+  ------------------------------------------------------- */
+
+  $("[srcset]").each((_, element) => {
+    const value = $(element).attr("srcset");
+
+    if (!value) return;
+
+    const rewritten = value
       .split(",")
-      .map(part => {
+      .map(item => {
+
         const pieces =
-          part.trim().split(/\s+/);
+          item.trim().split(/\s+/);
 
-        const src = pieces.shift();
+        const source =
+          pieces.shift();
 
-        try {
-          const absolute = new URL(
-            src,
-            baseUrl
-          ).href;
-
-          return [
-            proxyUrl(absolute),
-            ...pieces
-          ].join(" ");
-        } catch {
-          return part.trim();
+        if (!source) {
+          return item;
         }
+
+        const absolute =
+          resolveUrl(
+            source,
+            baseUrl
+          );
+
+        if (!absolute) {
+          return item;
+        }
+
+        return [
+          makeProxyUrl(absolute),
+          ...pieces
+        ].join(" ");
       })
       .join(", ");
 
-    $(el).attr(
+    $(element).attr(
       "srcset",
       rewritten
     );
   });
 
-  /* Proxy toolbar */
+  /* -------------------------------------------------------
+     ADD FASTPROXY TOOLBAR
+  ------------------------------------------------------- */
 
   if ($("body").length) {
+
     $("body").prepend(`
-      <div style="
-        position:sticky;
-        top:0;
-        left:0;
-        right:0;
-        z-index:999999;
-        height:42px;
-        display:flex;
-        align-items:center;
-        gap:10px;
-        padding:0 14px;
-        background:#111827;
-        color:white;
-        font-family:Arial,sans-serif;
-        font-size:14px;
-        box-shadow:0 1px 5px rgba(0,0,0,.25);
-      ">
+      <div
+        style="
+          position:sticky;
+          top:0;
+          z-index:2147483647;
+          display:flex;
+          align-items:center;
+          gap:10px;
+          height:42px;
+          padding:0 14px;
+          background:#111827;
+          color:white;
+          font-family:Arial,sans-serif;
+          font-size:14px;
+          box-shadow:0 1px 5px rgba(0,0,0,.25);
+        "
+      >
 
-        <strong>FastProxy</strong>
+        <strong>
+          ⚡ FastProxy
+        </strong>
 
-        <span style="
-          overflow:hidden;
-          text-overflow:ellipsis;
-          white-space:nowrap;
-          opacity:.8;
-          max-width:70%;
-        ">
+        <span
+          style="
+            opacity:.75;
+            overflow:hidden;
+            white-space:nowrap;
+            text-overflow:ellipsis;
+            max-width:70%;
+          "
+        >
           ${escapeHtml(baseUrl)}
         </span>
 
@@ -438,9 +517,9 @@ function rewriteHtml(html, baseUrl) {
   return $.html();
 }
 
-/* =========================================
-   HOME
-========================================= */
+/* =========================================================
+   HOME PAGE
+========================================================= */
 
 app.get("/", (req, res) => {
   res.sendFile(
@@ -452,16 +531,12 @@ app.get("/", (req, res) => {
   );
 });
 
-/* =========================================
+/* =========================================================
    HEALTH CHECK
-========================================= */
-
-/*
- * Your frontend uses this endpoint
- * to measure which proxy server is fastest.
- */
+========================================================= */
 
 app.get("/health", (req, res) => {
+
   res.setHeader(
     "Access-Control-Allow-Origin",
     "*"
@@ -472,19 +547,26 @@ app.get("/health", (req, res) => {
     "no-store"
   );
 
-  res.json({
+  res.status(200).json({
     status: "ok",
     server: "FastProxy",
+    uptime: process.uptime(),
     timestamp: Date.now()
   });
+
 });
 
-/* =========================================
+/* =========================================================
    PROXY
-========================================= */
+========================================================= */
 
 app.get("/proxy", async (req, res) => {
+
+  const started =
+    performance.now();
+
   try {
+
     const requestedUrl =
       req.query.url;
 
@@ -505,12 +587,15 @@ app.get("/proxy", async (req, res) => {
     const cacheKey =
       target.href;
 
-    /* Check cache */
+    /* -------------------------------------------------------
+       CACHE HIT
+    ------------------------------------------------------- */
 
     const cached =
       getCache(cacheKey);
 
     if (cached) {
+
       res.setHeader(
         "Content-Type",
         cached.contentType
@@ -531,7 +616,9 @@ app.get("/proxy", async (req, res) => {
       );
     }
 
-    /* Fetch target */
+    /* -------------------------------------------------------
+       REQUEST
+    ------------------------------------------------------- */
 
     const response =
       await axios.get(
@@ -542,13 +629,22 @@ app.get("/proxy", async (req, res) => {
           responseType:
             "arraybuffer",
 
-          timeout: 12000,
+          timeout:
+            15000,
 
-          maxRedirects: 5,
+          /*
+           * Follow normal website redirects.
+           */
+          maxRedirects:
+            10,
 
           headers: {
+
+            /*
+             * Browser-like headers.
+             */
             "User-Agent":
-              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/150 Safari/537.36",
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
 
             "Accept":
               "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
@@ -556,15 +652,24 @@ app.get("/proxy", async (req, res) => {
             "Accept-Language":
               "en-US,en;q=0.9",
 
+            "Accept-Encoding":
+              "gzip, deflate, br",
+
+            "Cache-Control":
+              "no-cache",
+
+            "Upgrade-Insecure-Requests":
+              "1",
+
             "Referer":
               target.origin + "/"
           },
 
           maxContentLength:
-            15 * 1024 * 1024,
+            20 * 1024 * 1024,
 
           maxBodyLength:
-            15 * 1024 * 1024,
+            20 * 1024 * 1024,
 
           validateStatus:
             status =>
@@ -579,7 +684,20 @@ app.get("/proxy", async (req, res) => {
       ] ||
       "application/octet-stream";
 
-    /* HTML */
+    /* -------------------------------------------------------
+       LOG
+    ------------------------------------------------------- */
+
+    console.log(
+      `[${Math.round(performance.now() - started)}ms]`,
+      response.status,
+      target.href,
+      contentType
+    );
+
+    /* -------------------------------------------------------
+       HTML
+    ------------------------------------------------------- */
 
     if (
       contentType.includes(
@@ -589,6 +707,7 @@ app.get("/proxy", async (req, res) => {
         "application/xhtml+xml"
       )
     ) {
+
       const html =
         Buffer
           .from(response.data)
@@ -600,15 +719,11 @@ app.get("/proxy", async (req, res) => {
           target.href
         );
 
-      /*
-       * HTML gets a short cache.
-       */
-
       setCache(
         cacheKey,
         rewritten,
         "text/html; charset=utf-8",
-        30 * 1000
+        HTML_CACHE_TIME
       );
 
       res.setHeader(
@@ -626,21 +741,28 @@ app.get("/proxy", async (req, res) => {
         "MISS"
       );
 
+      res.setHeader(
+        "X-FastProxy-Time",
+        Math.round(
+          performance.now() - started
+        )
+      );
+
       return res.send(
         rewritten
       );
     }
 
-    /*
-     * Images, CSS, JS, fonts,
-     * videos, etc.
-     */
+    /* -------------------------------------------------------
+       OTHER RESOURCES
+       images / css / js / fonts / video / etc.
+    ------------------------------------------------------- */
 
     setCache(
       cacheKey,
       response.data,
       contentType,
-      5 * 60 * 1000
+      ASSET_CACHE_TIME
     );
 
     res.setHeader(
@@ -658,6 +780,13 @@ app.get("/proxy", async (req, res) => {
       "MISS"
     );
 
+    res.setHeader(
+      "X-FastProxy-Time",
+      Math.round(
+        performance.now() - started
+      )
+    );
+
     return res.send(
       response.data
     );
@@ -665,16 +794,41 @@ app.get("/proxy", async (req, res) => {
   } catch (error) {
 
     console.error(
-      "Proxy error:",
+      "FASTPROXY ERROR:",
       error.message
     );
 
-    const message =
+    /*
+     * Axios timeout.
+     */
+    if (
+      error.code === "ECONNABORTED"
+    ) {
+
+      return res
+        .status(504)
+        .send(`
+          <h1>FastProxy Timeout</h1>
+          <p>
+            The website took too long to respond.
+          </p>
+          <p>
+            <a href="/">Back to FastProxy</a>
+          </p>
+        `);
+
+    }
+
+    let message =
       error.message ||
-      "Unable to retrieve that website.";
+      "Unable to load the website.";
+
+    /*
+     * Friendly error page.
+     */
 
     return res
-      .status(500)
+      .status(502)
       .send(`
         <!DOCTYPE html>
 
@@ -684,6 +838,11 @@ app.get("/proxy", async (req, res) => {
 
           <meta charset="UTF-8">
 
+          <meta
+            name="viewport"
+            content="width=device-width,initial-scale=1"
+          >
+
           <title>
             FastProxy Error
           </title>
@@ -692,25 +851,38 @@ app.get("/proxy", async (req, res) => {
 
             body {
               margin:0;
-              padding:40px;
-              font-family:Arial,sans-serif;
-              background:#0f172a;
+              min-height:100vh;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              padding:20px;
+              background:#070b14;
               color:white;
+              font-family:Arial,sans-serif;
             }
 
             .box {
-              max-width:700px;
-              margin:auto;
-              padding:25px;
-              border-radius:16px;
-              background:#1e293b;
+              width:min(650px,100%);
+              padding:30px;
+              border-radius:20px;
+              background:#111827;
+              border:1px solid #273449;
               box-shadow:
-                0 20px 60px
-                rgba(0,0,0,.3);
+                0 30px 80px
+                rgba(0,0,0,.4);
+            }
+
+            h1 {
+              margin-top:0;
+            }
+
+            p {
+              color:#94a3b8;
+              line-height:1.6;
             }
 
             a {
-              color:#60a5fa;
+              color:#93c5fd;
             }
 
           </style>
@@ -722,16 +894,18 @@ app.get("/proxy", async (req, res) => {
           <div class="box">
 
             <h1>
-              FastProxy Error
+              ⚡ FastProxy
             </h1>
 
             <p>
               ${escapeHtml(message)}
             </p>
 
-            <a href="/">
-              Back to FastProxy
-            </a>
+            <p>
+              <a href="/">
+                Return to FastProxy
+              </a>
+            </p>
 
           </div>
 
@@ -742,20 +916,22 @@ app.get("/proxy", async (req, res) => {
   }
 });
 
-/* =========================================
-   START SERVER
-========================================= */
+/* =========================================================
+   START
+========================================================= */
 
 app.listen(
   PORT,
   "0.0.0.0",
   () => {
+
     console.log(
       `FastProxy running on port ${PORT}`
     );
 
     console.log(
-      `Health endpoint: /health`
+      `Health: http://localhost:${PORT}/health`
     );
+
   }
 );
