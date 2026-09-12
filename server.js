@@ -1,13 +1,31 @@
 const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
+const compression = require("compression");
 const dns = require("dns").promises;
 const net = require("net");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static("public"));
+app.use(compression());
+app.use(express.static(path.join(__dirname, "public"), {
+  maxAge: "1h"
+}));
+
+/*
+ * Small in-memory cache.
+ *
+ * This means repeated visits to the same page don't always
+ * require a brand-new request to the target website.
+ */
+const pageCache = new Map();
+
+const CACHE_TIME = 30 * 1000;
+const MAX_CACHE_ITEMS = 100;
+
+const hostSafetyCache = new Map();
 
 function isPrivateIPv4(ip) {
   const parts = ip.split(".").map(Number);
@@ -29,17 +47,23 @@ function isPrivateIPv4(ip) {
 }
 
 function isPrivateIPv6(ip) {
-  const normalized = ip.toLowerCase();
+  const value = ip.toLowerCase();
 
   return (
-    normalized === "::1" ||
-    normalized.startsWith("fc") ||
-    normalized.startsWith("fd") ||
-    normalized.startsWith("fe80:")
+    value === "::1" ||
+    value.startsWith("fc") ||
+    value.startsWith("fd") ||
+    value.startsWith("fe80:")
   );
 }
 
 async function isSafeHost(hostname) {
+  const cached = hostSafetyCache.get(hostname);
+
+  if (cached && cached.expires > Date.now()) {
+    return cached.value;
+  }
+
   const host = hostname.toLowerCase();
 
   if (
@@ -50,29 +74,41 @@ async function isSafeHost(hostname) {
     return false;
   }
 
+  let safe = false;
+
   if (net.isIP(host) === 4) {
-    return !isPrivateIPv4(host);
-  }
+    safe = !isPrivateIPv4(host);
+  } else if (net.isIP(host) === 6) {
+    safe = !isPrivateIPv6(host);
+  } else {
+    try {
+      const addresses = await dns.lookup(host, {
+        all: true
+      });
 
-  if (net.isIP(host) === 6) {
-    return !isPrivateIPv6(host);
-  }
+      safe = addresses.length > 0 &&
+        addresses.every(address => {
+          if (address.family === 4) {
+            return !isPrivateIPv4(address.address);
+          }
 
-  try {
-    const result = await dns.lookup(host);
+          if (address.family === 6) {
+            return !isPrivateIPv6(address.address);
+          }
 
-    if (result.family === 4) {
-      return !isPrivateIPv4(result.address);
+          return false;
+        });
+    } catch {
+      safe = false;
     }
-
-    if (result.family === 6) {
-      return !isPrivateIPv6(result.address);
-    }
-
-    return false;
-  } catch {
-    return false;
   }
+
+  hostSafetyCache.set(hostname, {
+    value: safe,
+    expires: Date.now() + 5 * 60 * 1000
+  });
+
+  return safe;
 }
 
 async function validateUrl(rawUrl) {
@@ -84,7 +120,10 @@ async function validateUrl(rawUrl) {
     throw new Error("Invalid URL.");
   }
 
-  if (url.protocol !== "http:" && url.protocol !== "https:") {
+  if (
+    url.protocol !== "http:" &&
+    url.protocol !== "https:"
+  ) {
     throw new Error("Only HTTP and HTTPS URLs are allowed.");
   }
 
@@ -95,7 +134,7 @@ async function validateUrl(rawUrl) {
   return url;
 }
 
-function makeProxyUrl(target) {
+function proxyUrl(target) {
   return "/proxy?url=" + encodeURIComponent(target);
 }
 
@@ -108,6 +147,25 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
+/*
+ * Rewrite the page intelligently.
+ *
+ * IMPORTANT:
+ *
+ * Navigation:
+ *   goes through our proxy.
+ *
+ * Images:
+ *   load directly from the original website.
+ *
+ * CSS:
+ *   loads directly from the original website.
+ *
+ * JavaScript:
+ *   loads directly from the original website.
+ *
+ * This is much faster than proxying every asset.
+ */
 function rewriteHtml(html, baseUrl) {
   const $ = cheerio.load(html, {
     decodeEntities: false
@@ -115,6 +173,9 @@ function rewriteHtml(html, baseUrl) {
 
   $("base").remove();
 
+  /*
+   * Links.
+   */
   $("a[href]").each((_, element) => {
     const href = $(element).attr("href");
 
@@ -131,10 +192,17 @@ function rewriteHtml(html, baseUrl) {
 
     try {
       const absolute = new URL(href, baseUrl).href;
-      $(element).attr("href", makeProxyUrl(absolute));
+
+      $(element).attr(
+        "href",
+        proxyUrl(absolute)
+      );
     } catch {}
   });
 
+  /*
+   * Forms.
+   */
   $("form[action]").each((_, element) => {
     const action = $(element).attr("action");
 
@@ -142,10 +210,17 @@ function rewriteHtml(html, baseUrl) {
 
     try {
       const absolute = new URL(action, baseUrl).href;
-      $(element).attr("action", makeProxyUrl(absolute));
+
+      $(element).attr(
+        "action",
+        proxyUrl(absolute)
+      );
     } catch {}
   });
 
+  /*
+   * Images load directly from the original server.
+   */
   $("img[src]").each((_, element) => {
     const src = $(element).attr("src");
 
@@ -153,10 +228,14 @@ function rewriteHtml(html, baseUrl) {
 
     try {
       const absolute = new URL(src, baseUrl).href;
-      $(element).attr("src", makeProxyUrl(absolute));
+
+      $(element).attr("src", absolute);
     } catch {}
   });
 
+  /*
+   * Scripts load directly.
+   */
   $("script[src]").each((_, element) => {
     const src = $(element).attr("src");
 
@@ -164,137 +243,299 @@ function rewriteHtml(html, baseUrl) {
 
     try {
       const absolute = new URL(src, baseUrl).href;
-      $(element).attr("src", makeProxyUrl(absolute));
+
+      $(element).attr("src", absolute);
     } catch {}
   });
 
-  $('link[href]').each((_, element) => {
+  /*
+   * CSS loads directly.
+   */
+  $("link[href]").each((_, element) => {
     const href = $(element).attr("href");
 
     if (!href) return;
 
     try {
       const absolute = new URL(href, baseUrl).href;
-      $(element).attr("href", makeProxyUrl(absolute));
+
+      $(element).attr("href", absolute);
     } catch {}
   });
 
+  /*
+   * Video/audio.
+   */
+  $("video[src], audio[src], source[src]").each(
+    (_, element) => {
+      const src = $(element).attr("src");
+
+      if (!src) return;
+
+      try {
+        const absolute = new URL(src, baseUrl).href;
+
+        $(element).attr("src", absolute);
+      } catch {}
+    }
+  );
+
+  /*
+   * Preload resources directly.
+   */
+  $("link[rel='preload']").each((_, element) => {
+    const href = $(element).attr("href");
+
+    if (!href) return;
+
+    try {
+      const absolute = new URL(href, baseUrl).href;
+
+      $(element).attr("href", absolute);
+    } catch {}
+  });
+
+  /*
+   * Proxy toolbar.
+   */
   if ($("body").length) {
     $("body").prepend(`
       <div style="
         position:sticky;
         top:0;
         z-index:999999;
-        padding:8px 12px;
+        height:42px;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:0 14px;
         background:#111827;
         color:white;
         font-family:Arial,sans-serif;
         font-size:14px;
-        border-bottom:1px solid #374151;
+        box-shadow:0 1px 4px rgba(0,0,0,.25);
       ">
-        Proxy:
-        <strong>${escapeHtml(baseUrl)}</strong>
-        &nbsp;
-        <a href="/" style="color:#93c5fd;">Home</a>
+        <strong>Proxy</strong>
+
+        <span style="
+          opacity:.75;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+          max-width:70%;
+        ">
+          ${escapeHtml(baseUrl)}
+        </span>
+
+        <a
+          href="/"
+          style="
+            margin-left:auto;
+            color:#93c5fd;
+            text-decoration:none;
+          "
+        >
+          Home
+        </a>
       </div>
     `);
   }
 
   return $.html();
 }
+
+/*
+ * Homepage.
+ */
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+  res.sendFile(
+    path.join(__dirname, "public", "index.html")
+  );
 });
 
+/*
+ * Main proxy.
+ */
 app.get("/proxy", async (req, res) => {
   try {
     const requestedUrl = req.query.url;
 
-    if (!requestedUrl || typeof requestedUrl !== "string") {
+    if (
+      !requestedUrl ||
+      typeof requestedUrl !== "string"
+    ) {
       return res.status(400).send("Missing URL.");
     }
 
     const target = await validateUrl(requestedUrl);
 
-    const response = await axios.get(target.href, {
-      proxy: false,
-      responseType: "text",
-      timeout: 15000,
-      maxRedirects: 5,
+    const cacheKey = target.href;
 
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; SimpleWebProxy/1.0)"
-      },
+    /*
+     * Check page cache.
+     */
+    const cached = pageCache.get(cacheKey);
 
-      maxContentLength: 5 * 1024 * 1024,
-      maxBodyLength: 5 * 1024 * 1024,
+    if (
+      cached &&
+      cached.expires > Date.now()
+    ) {
+      res.setHeader(
+        "Content-Type",
+        "text/html; charset=utf-8"
+      );
 
-      validateStatus: status => status >= 200 && status < 400
-    });
+      res.setHeader(
+        "Cache-Control",
+        "public, max-age=15"
+      );
+
+      return res.send(cached.html);
+    }
+
+    /*
+     * Fetch target.
+     */
+    const response = await axios.get(
+      target.href,
+      {
+        proxy: false,
+        responseType: "text",
+
+        timeout: 10000,
+
+        maxRedirects: 5,
+
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (compatible; FastWebProxy/2.0)",
+          "Accept":
+            "text/html,application/xhtml+xml"
+        },
+
+        maxContentLength:
+          8 * 1024 * 1024,
+
+        maxBodyLength:
+          8 * 1024 * 1024,
+
+        validateStatus: status =>
+          status >= 200 &&
+          status < 400
+      }
+    );
 
     const contentType =
       response.headers["content-type"] || "";
 
-    if (!contentType.includes("text/html")) {
-      res.setHeader("Content-Type", contentType);
-      return res.send(response.data);
+    /*
+     * HTML.
+     */
+    if (contentType.includes("text/html")) {
+      const rewritten = rewriteHtml(
+        response.data,
+        target.href
+      );
+
+      /*
+       * Keep cache small.
+       */
+      if (pageCache.size >= MAX_CACHE_ITEMS) {
+        const firstKey =
+          pageCache.keys().next().value;
+
+        pageCache.delete(firstKey);
+      }
+
+      pageCache.set(cacheKey, {
+        html: rewritten,
+        expires:
+          Date.now() + CACHE_TIME
+      });
+
+      res.setHeader(
+        "Content-Type",
+        "text/html; charset=utf-8"
+      );
+
+      res.setHeader(
+        "Cache-Control",
+        "public, max-age=15"
+      );
+
+      return res.send(rewritten);
     }
 
-    const output = rewriteHtml(
-      response.data,
-      target.href
+    /*
+     * Other content.
+     */
+    res.setHeader(
+      "Content-Type",
+      contentType || "application/octet-stream"
     );
 
     res.setHeader(
-      "Content-Type",
-      "text/html; charset=utf-8"
+      "Cache-Control",
+      "public, max-age=3600"
     );
 
-    res.send(output);
+    return res.send(response.data);
 
   } catch (error) {
     console.error(error);
 
+    const message =
+      error.message ||
+      "Unable to retrieve that website.";
+
     res.status(500).send(`
       <!DOCTYPE html>
       <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>Proxy Error</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            background: #f3f4f6;
-            padding: 40px;
-          }
+        <head>
+          <meta charset="UTF-8">
+          <title>Proxy Error</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background:#0f172a;
+              color:white;
+              padding:40px;
+            }
 
-          .box {
-            max-width: 700px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-          }
+            .box {
+              max-width:700px;
+              margin:auto;
+              background:#1e293b;
+              padding:25px;
+              border-radius:14px;
+            }
 
-          a {
-            color: #2563eb;
-          }
-        </style>
-      </head>
+            a {
+              color:#60a5fa;
+            }
+          </style>
+        </head>
 
-      <body>
-        <div class="box">
-          <h1>Proxy Error</h1>
-          <p>${escapeHtml(error.message)}</p>
-          <p><a href="/">Go Home</a></p>
-        </div>
-      </body>
+        <body>
+          <div class="box">
+            <h1>Proxy Error</h1>
+
+            <p>
+              ${escapeHtml(message)}
+            </p>
+
+            <a href="/">
+              Back to proxy
+            </a>
+          </div>
+        </body>
       </html>
     `);
   }
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Proxy server running on port ${PORT}`);
+  console.log(
+    `Fast proxy running on port ${PORT}`
+  );
 });
