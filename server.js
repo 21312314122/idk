@@ -202,7 +202,10 @@ function rewriteHtml(html, baseUrl) {
 
   return $.html();
 }
-
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
+});
+‹
 app.get("/proxy", async (req, res) => {
   try {
     const requestedUrl = req.query.url;
