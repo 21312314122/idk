@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 
 <meta
@@ -15,34 +14,25 @@
 <style>
 
 :root {
-
   --bg:#060a13;
   --panel:#101827;
   --panel2:#172235;
   --border:rgba(255,255,255,.08);
-
   --text:#f8fafc;
   --muted:#94a3b8;
-
   --accent:#6366f1;
   --accent2:#8b5cf6;
-
   --green:#22c55e;
-  --yellow:#facc15;
   --red:#ef4444;
-
 }
 
 body.light {
-
   --bg:#eef2f7;
   --panel:#ffffff;
   --panel2:#f3f6fa;
   --border:rgba(15,23,42,.09);
-
   --text:#0f172a;
   --muted:#64748b;
-
 }
 
 * {
@@ -51,11 +41,9 @@ body.light {
 
 html,
 body {
-
   width:100%;
   height:100%;
   margin:0;
-
   font-family:
     Inter,
     system-ui,
@@ -63,10 +51,8 @@ body {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-
   background:var(--bg);
   color:var(--text);
-
 }
 
 body {
@@ -83,96 +69,62 @@ button {
 }
 
 .browser {
-
   height:100vh;
-
   display:flex;
   flex-direction:column;
-
   background:
-
     radial-gradient(
       circle at 10% 0%,
       rgba(99,102,241,.20),
       transparent 28%
     ),
-
     radial-gradient(
       circle at 95% 100%,
       rgba(139,92,246,.15),
       transparent 30%
     ),
-
     var(--bg);
-
 }
 
-/* =========================================================
-   HEADER
-========================================================= */
+/* HEADER */
 
 .header {
-
   height:62px;
-
   flex-shrink:0;
-
   display:flex;
   align-items:center;
-
   gap:12px;
-
-  padding:
-    0 16px;
-
-  background:
-    rgba(16,24,39,.82);
-
-  backdrop-filter:
-    blur(25px);
-
-  border-bottom:
-    1px solid var(--border);
-
+  padding:0 16px;
+  background:rgba(16,24,39,.82);
+  backdrop-filter:blur(25px);
+  border-bottom:1px solid var(--border);
 }
 
 body.light .header {
-
-  background:
-    rgba(255,255,255,.82);
-
+  background:rgba(255,255,255,.82);
 }
 
 .logo {
-
   width:39px;
   height:39px;
-
   display:grid;
   place-items:center;
-
   border-radius:13px;
-
   background:
     linear-gradient(
       135deg,
       var(--accent),
       var(--accent2)
     );
-
   box-shadow:
     0 12px 35px
     rgba(99,102,241,.32);
-
   font-size:20px;
-
 }
 
 .brand {
-
   font-weight:900;
   font-size:17px;
-
 }
 
 .brand span {
@@ -180,124 +132,61 @@ body.light .header {
 }
 
 .online {
-
   display:flex;
   align-items:center;
-
   gap:6px;
-
   color:var(--muted);
-
   font-size:12px;
-
 }
 
 .online-dot {
-
   width:8px;
   height:8px;
-
   border-radius:50%;
-
-  background:
-    var(--green);
-
+  background:var(--green);
   box-shadow:
     0 0 12px
     rgba(34,197,94,.65);
-
 }
 
 .header-space {
   flex:1;
 }
 
+/* SERVER */
+
 .server-button {
-
   height:38px;
-
   display:flex;
   align-items:center;
-
   gap:8px;
-
-  padding:
-    0 13px;
-
+  padding:0 13px;
   border-radius:11px;
-
-  background:
-    var(--panel2);
-
+  background:var(--panel2);
   color:var(--text);
-
-  border:
-    1px solid var(--border);
-
+  border:1px solid var(--border);
   cursor:pointer;
-
   font-size:12px;
-
 }
 
 .server-button:hover {
-
-  border-color:
-    var(--accent);
-
+  border-color:var(--accent);
 }
-
-.theme {
-
-  width:38px;
-  height:38px;
-
-  border-radius:11px;
-
-  background:
-    var(--panel2);
-
-  color:var(--text);
-
-  border:
-    1px solid var(--border);
-
-  cursor:pointer;
-
-}
-
-/* =========================================================
-   SERVER MENU
-========================================================= */
 
 .server-menu {
-
-  position:
-    fixed;
-
+  position:fixed;
   top:58px;
   right:12px;
-
-  width:280px;
-
+  width:285px;
   display:none;
-
   z-index:5000;
-
   padding:12px;
-
   border-radius:17px;
-
-  background:
-    var(--panel);
-
-  border:
-    1px solid var(--border);
-
+  background:var(--panel);
+  border:1px solid var(--border);
   box-shadow:
     0 30px 100px
-    rgba(0,0,0,.40);
-
+    rgba(0,0,0,.4);
 }
 
 .server-menu.show {
@@ -305,45 +194,26 @@ body.light .header {
 }
 
 .server-heading {
-
-  padding:
-    5px 7px 10px;
-
+  padding:5px 7px 10px;
   font-size:13px;
-
   font-weight:800;
-
 }
 
 .server-option {
-
   width:100%;
-
   display:flex;
   align-items:center;
-
   gap:10px;
-
   padding:12px;
-
   border-radius:11px;
-
-  background:
-    transparent;
-
+  background:transparent;
   color:var(--text);
-
   cursor:pointer;
-
   text-align:left;
-
 }
 
 .server-option:hover {
-
-  background:
-    var(--panel2);
-
+  background:var(--panel2);
 }
 
 .server-option-name {
@@ -351,46 +221,81 @@ body.light .header {
 }
 
 .server-status {
-
-  font-size:10px;
-
   color:var(--muted);
-
+  font-size:10px;
 }
 
-/* =========================================================
-   TABS
-========================================================= */
+/* THEME */
 
-.tabs {
+.theme {
+  width:38px;
+  height:38px;
+  border-radius:11px;
+  background:var(--panel2);
+  color:var(--text);
+  border:1px solid var(--border);
+  cursor:pointer;
+}
 
-  min-height:42px;
+/* DEACTIVATION */
 
-  display:flex;
-  align-items:end;
-
-  gap:5px;
-
-  padding:
-    0 9px;
-
-  overflow-x:auto;
-
-  scrollbar-width:none;
+.deactivate {
+  height:38px;
+  padding:0 14px;
+  border-radius:11px;
 
   background:
-    rgba(16,24,39,.82);
+    linear-gradient(
+      135deg,
+      #ef4444,
+      #b91c1c
+    );
 
-  border-bottom:
-    1px solid var(--border);
+  color:white;
 
+  border:1px solid
+    rgba(255,255,255,.12);
+
+  cursor:pointer;
+
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.4px;
+
+  box-shadow:
+    0 8px 25px
+    rgba(239,68,68,.18);
+
+  transition:
+    transform .15s ease,
+    filter .15s ease;
+}
+
+.deactivate:hover {
+  transform:translateY(-1px);
+  filter:brightness(1.08);
+}
+
+.deactivate:active {
+  transform:translateY(0);
+}
+
+/* TABS */
+
+.tabs {
+  min-height:42px;
+  display:flex;
+  align-items:end;
+  gap:5px;
+  padding:0 9px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  background:rgba(16,24,39,.82);
+  border-bottom:1px solid var(--border);
 }
 
 body.light .tabs {
-
-  background:
-    rgba(255,255,255,.82);
-
+  background:rgba(255,255,255,.82);
 }
 
 .tabs::-webkit-scrollbar {
@@ -398,295 +303,158 @@ body.light .tabs {
 }
 
 .tab {
-
   height:37px;
-
   min-width:145px;
   max-width:230px;
-
   display:flex;
   align-items:center;
-
   gap:8px;
-
-  padding:
-    0 10px;
-
-  border-radius:
-    10px 10px 0 0;
-
-  background:
-    var(--panel2);
-
-  color:
-    var(--muted);
-
+  padding:0 10px;
+  border-radius:10px 10px 0 0;
+  background:var(--panel2);
+  color:var(--muted);
   cursor:pointer;
-
-  border:
-    1px solid transparent;
-
+  border:1px solid transparent;
   border-bottom:0;
-
 }
 
 .tab.active {
-
-  background:
-    var(--bg);
-
-  color:
-    var(--text);
-
-  border-color:
-    var(--border);
-
+  background:var(--bg);
+  color:var(--text);
+  border-color:var(--border);
 }
 
 .tab-title {
-
   flex:1;
-
   overflow:hidden;
-
   white-space:nowrap;
-
   text-overflow:ellipsis;
-
   font-size:13px;
-
 }
 
 .tab-close {
-
   width:22px;
   height:22px;
-
   border-radius:6px;
-
-  background:
-    transparent;
-
-  color:
-    var(--muted);
-
+  background:transparent;
+  color:var(--muted);
   cursor:pointer;
-
 }
 
 .tab-close:hover {
-
-  background:
-    rgba(148,163,184,.12);
-
-  color:
-    var(--text);
-
+  background:rgba(148,163,184,.12);
+  color:var(--text);
 }
 
 .new-tab {
-
   width:35px;
   height:35px;
-
   margin-bottom:1px;
-
   border-radius:9px;
-
-  background:
-    transparent;
-
-  color:
-    var(--muted);
-
+  background:transparent;
+  color:var(--muted);
   cursor:pointer;
-
   font-size:22px;
-
 }
 
-/* =========================================================
-   NAVIGATION
-========================================================= */
+/* NAV */
 
 .nav {
-
   display:flex;
   align-items:center;
-
   gap:6px;
-
-  padding:
-    8px 10px;
-
-  background:
-    rgba(16,24,39,.82);
-
-  border-bottom:
-    1px solid var(--border);
-
+  padding:8px 10px;
+  background:rgba(16,24,39,.82);
+  border-bottom:1px solid var(--border);
 }
 
 body.light .nav {
-
-  background:
-    rgba(255,255,255,.82);
-
+  background:rgba(255,255,255,.82);
 }
 
 .nav-button {
-
   width:38px;
   height:38px;
-
   border-radius:10px;
-
-  background:
-    var(--panel2);
-
-  color:
-    var(--text);
-
-  border:
-    1px solid var(--border);
-
+  background:var(--panel2);
+  color:var(--text);
   cursor:pointer;
-
+  border:1px solid var(--border);
   font-size:17px;
-
 }
 
 .nav-button:disabled {
-
   opacity:.3;
-
   cursor:default;
-
 }
 
 .address-wrap {
-
   flex:1;
-
   position:relative;
-
 }
 
 .address {
-
   width:100%;
-
   height:40px;
-
-  padding:
-    0 65px 0 42px;
-
+  padding:0 65px 0 42px;
   border-radius:20px;
-
-  border:
-    1px solid var(--border);
-
+  border:1px solid var(--border);
   outline:none;
-
-  background:
-    rgba(2,6,23,.35);
-
-  color:
-    var(--text);
-
+  background:rgba(2,6,23,.35);
+  color:var(--text);
 }
 
 body.light .address {
-
-  background:
-    #f8fafc;
-
+  background:#f8fafc;
 }
 
 .address:focus {
-
-  border-color:
-    var(--accent);
-
+  border-color:var(--accent);
   box-shadow:
     0 0 0 3px
     rgba(99,102,241,.12);
-
 }
 
 .lock {
-
   position:absolute;
-
   left:15px;
   top:11px;
-
   opacity:.7;
-
 }
 
 .go {
-
   position:absolute;
-
   right:5px;
   top:5px;
-
   height:30px;
-
-  padding:
-    0 13px;
-
+  padding:0 13px;
   border-radius:15px;
-
   background:
     linear-gradient(
       135deg,
       var(--accent),
       var(--accent2)
     );
-
   color:white;
-
   font-size:12px;
-
   font-weight:800;
-
   cursor:pointer;
-
 }
 
-/* =========================================================
-   INFO BAR
-========================================================= */
+/* INFO */
 
 .info {
-
   height:31px;
-
   display:flex;
   align-items:center;
-
   gap:19px;
-
-  padding:
-    0 14px;
-
-  background:
-    var(--panel);
-
-  border-bottom:
-    1px solid var(--border);
-
-  color:
-    var(--muted);
-
+  padding:0 14px;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
   font-size:11px;
-
-  overflow-x:auto;
-
   white-space:nowrap;
-
+  overflow-x:auto;
 }
 
 .info strong {
@@ -697,28 +465,18 @@ body.light .address {
   color:var(--green);
 }
 
-/* =========================================================
-   CONTENT
-========================================================= */
+/* CONTENT */
 
 .content {
-
   flex:1;
-
   min-height:0;
-
   position:relative;
-
 }
 
 .page {
-
   position:absolute;
-
   inset:0;
-
   display:none;
-
 }
 
 .page.active {
@@ -726,87 +484,54 @@ body.light .address {
 }
 
 iframe {
-
   width:100%;
   height:100%;
-
   border:0;
-
   background:white;
-
 }
 
-/* =========================================================
-   HOME
-========================================================= */
+/* HOME */
 
 .home {
-
   height:100%;
-
   overflow:auto;
-
   display:flex;
-
   justify-content:center;
-
-  padding:
-    62px 20px;
-
+  padding:62px 20px;
 }
 
 .home-inner {
-
-  width:
-    min(1050px,100%);
-
+  width:min(1050px,100%);
   text-align:center;
-
 }
 
 .hero-icon {
-
   width:86px;
   height:86px;
-
   display:grid;
   place-items:center;
-
-  margin:
-    0 auto 20px;
-
+  margin:0 auto 20px;
   border-radius:26px;
-
   background:
     linear-gradient(
       135deg,
       var(--accent),
       var(--accent2)
     );
-
   box-shadow:
     0 25px 70px
     rgba(99,102,241,.32);
-
   font-size:37px;
-
 }
 
 .hero {
-
   margin:0;
-
-  font-size:
-    clamp(44px,7vw,76px);
-
+  font-size:clamp(44px,7vw,76px);
   font-weight:950;
-
   letter-spacing:-4px;
-
 }
 
 .hero span {
-
   background:
     linear-gradient(
       90deg,
@@ -814,223 +539,124 @@ iframe {
       #8b5cf6,
       #ec4899
     );
-
   -webkit-background-clip:text;
   background-clip:text;
-
   color:transparent;
-
 }
 
 .subtitle {
-
   max-width:680px;
-
-  margin:
-    18px auto 30px;
-
-  color:
-    var(--muted);
-
+  margin:18px auto 30px;
+  color:var(--muted);
   line-height:1.6;
-
 }
 
 .home-search {
-
-  width:
-    min(800px,100%);
-
+  width:min(800px,100%);
   display:flex;
-
   gap:8px;
-
   padding:7px;
-
   margin:auto;
-
   border-radius:18px;
-
-  background:
-    var(--panel);
-
-  border:
-    1px solid var(--border);
-
+  background:var(--panel);
+  border:1px solid var(--border);
   box-shadow:
     0 30px 90px
     rgba(0,0,0,.25);
-
 }
 
 .home-input {
-
   flex:1;
-
   min-width:0;
-
   padding:15px;
-
   border:0;
-
   outline:0;
-
   background:transparent;
-
   color:var(--text);
-
   font-size:16px;
-
 }
 
 .home-go {
-
-  padding:
-    0 25px;
-
+  padding:0 25px;
   border-radius:13px;
-
   background:
     linear-gradient(
       135deg,
       var(--accent),
       var(--accent2)
     );
-
   color:white;
-
   font-weight:850;
-
   cursor:pointer;
-
 }
 
 .section-title {
-
   margin-top:38px;
-
   margin-bottom:14px;
-
   color:var(--muted);
-
   font-size:12px;
-
   font-weight:850;
-
   letter-spacing:1.2px;
-
   text-transform:uppercase;
-
 }
 
 .cards {
-
   display:grid;
-
-  grid-template-columns:
-    repeat(4,1fr);
-
+  grid-template-columns:repeat(4,1fr);
   gap:12px;
-
 }
 
 .card {
-
   text-align:left;
-
   padding:18px;
-
   border-radius:17px;
-
-  background:
-    var(--panel);
-
-  border:
-    1px solid var(--border);
-
-  color:
-    var(--text);
-
+  background:var(--panel);
+  border:1px solid var(--border);
+  color:var(--text);
   cursor:pointer;
-
   transition:
     transform .18s ease,
     border-color .18s ease;
-
 }
 
 .card:hover {
-
-  transform:
-    translateY(-3px);
-
-  border-color:
-    var(--accent);
-
+  transform:translateY(-3px);
+  border-color:var(--accent);
 }
 
 .card-icon {
-
   font-size:25px;
-
   margin-bottom:10px;
-
 }
 
 .card-name {
-
   font-size:14px;
-
   font-weight:850;
-
 }
 
 .card-url {
-
   margin-top:4px;
-
-  color:
-    var(--muted);
-
+  color:var(--muted);
   font-size:11px;
-
 }
 
-/* =========================================================
-   GAME PANEL
-========================================================= */
+/* GAME PANEL */
 
 .game-panel {
-
   position:fixed;
-
   bottom:15px;
   left:15px;
-
   z-index:4000;
-
   width:285px;
-
   display:none;
-
   padding:15px;
-
   border-radius:17px;
-
-  background:
-    rgba(15,23,42,.93);
-
-  border:
-    1px solid
-    rgba(255,255,255,.10);
-
+  background:rgba(15,23,42,.94);
+  border:1px solid rgba(255,255,255,.10);
   box-shadow:
     0 20px 80px
     rgba(0,0,0,.45);
-
-  backdrop-filter:
-    blur(20px);
-
+  backdrop-filter:blur(20px);
 }
 
 .game-panel.show {
@@ -1038,52 +664,33 @@ iframe {
 }
 
 .game-title {
-
   display:flex;
   align-items:center;
-
   gap:8px;
-
   font-size:14px;
-
   font-weight:900;
-
   margin-bottom:12px;
-
 }
 
 .game-dot {
-
   width:8px;
   height:8px;
-
   border-radius:50%;
-
-  background:
-    var(--green);
-
+  background:var(--green);
   box-shadow:
     0 0 12px
     rgba(34,197,94,.7);
-
 }
 
 .game-row {
-
   display:flex;
-
   justify-content:space-between;
-
   padding:7px 0;
-
   border-bottom:
     1px solid
     rgba(255,255,255,.06);
-
   color:#94a3b8;
-
   font-size:11px;
-
 }
 
 .game-row strong {
@@ -1091,45 +698,25 @@ iframe {
 }
 
 .game-close {
-
   float:right;
-
   width:24px;
   height:24px;
-
   border-radius:7px;
-
-  background:
-    rgba(255,255,255,.07);
-
+  background:rgba(255,255,255,.07);
   color:white;
-
   cursor:pointer;
-
 }
 
-/* =========================================================
-   LOADING
-========================================================= */
+/* LOADING */
 
 .loading {
-
   position:absolute;
-
   inset:0;
-
   z-index:3000;
-
   display:none;
-
   place-items:center;
-
-  background:
-    rgba(2,6,23,.94);
-
-  backdrop-filter:
-    blur(15px);
-
+  background:rgba(2,6,23,.94);
+  backdrop-filter:blur(15px);
 }
 
 .loading.show {
@@ -1137,103 +724,62 @@ iframe {
 }
 
 .loading-box {
-
-  width:
-    min(430px,88%);
-
+  width:min(430px,88%);
   padding:30px;
-
   text-align:center;
-
   border-radius:21px;
-
-  background:
-    #101827;
-
+  background:#101827;
   border:
     1px solid
     rgba(255,255,255,.08);
-
   box-shadow:
     0 30px 100px
     rgba(0,0,0,.5);
-
 }
 
 .spinner {
-
   width:58px;
   height:58px;
-
-  margin:
-    0 auto 18px;
-
+  margin:0 auto 18px;
   border-radius:50%;
-
   border:
     4px solid
     rgba(255,255,255,.08);
-
-  border-top-color:
-    #8b5cf6;
-
+  border-top-color:#8b5cf6;
   animation:
     spin .8s linear infinite;
-
 }
 
 @keyframes spin {
-
   to {
-    transform:
-      rotate(360deg);
+    transform:rotate(360deg);
   }
-
 }
 
 .loading-title {
-
   font-size:21px;
-
   font-weight:900;
-
 }
 
 .loading-url {
-
   margin-top:8px;
-
   color:#94a3b8;
-
   overflow:hidden;
-
   text-overflow:ellipsis;
-
   white-space:nowrap;
-
 }
 
 .progress {
-
   height:5px;
-
   margin-top:22px;
-
   border-radius:999px;
-
   overflow:hidden;
-
-  background:
-    rgba(255,255,255,.08);
-
+  background:rgba(255,255,255,.08);
 }
 
 .progress-bar {
-
   width:35%;
-
   height:100%;
-
   background:
     linear-gradient(
       90deg,
@@ -1241,63 +787,45 @@ iframe {
       #8b5cf6,
       #ec4899
     );
-
   animation:
     progress 1.3s ease-in-out infinite;
-
 }
 
 @keyframes progress {
-
   from {
-    transform:
-      translateX(-140%);
+    transform:translateX(-140%);
   }
 
   to {
-    transform:
-      translateX(380%);
+    transform:translateX(380%);
   }
-
 }
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+/* MOBILE */
 
-@media (
-  max-width:750px
-) {
+@media (max-width:750px) {
 
   .brand,
   .online {
     display:none;
   }
 
-  .cards {
+  .deactivate {
+    padding:0 9px;
+    font-size:9px;
+  }
 
+  .cards {
     grid-template-columns:
       repeat(2,1fr);
-
   }
 
   .home-search {
-
     flex-direction:column;
-
   }
 
   .home-go {
-
     height:50px;
-
-  }
-
-  .game-panel {
-
-    width:
-      calc(100% - 30px);
-
   }
 
 }
@@ -1347,9 +875,20 @@ iframe {
 
     </button>
 
+    <!-- DEACTIVATION BUTTON -->
+
+    <button
+      id="deactivate"
+      class="deactivate"
+      title="Close current website and clear its tab history"
+    >
+      DEACTIVATION
+    </button>
+
     <button
       id="theme"
       class="theme"
+      title="Toggle theme"
     >
       ☀️
     </button>
@@ -1471,9 +1010,7 @@ iframe {
 
     <span>
       🌎 Server:
-      <strong
-        id="currentServer"
-      >
+      <strong id="currentServer">
         US East
       </strong>
     </span>
@@ -1499,7 +1036,7 @@ iframe {
   ></main>
 
 
-  <!-- LOADING -->
+  <!-- LOADING SCREEN -->
 
   <div
     id="loading"
@@ -1562,9 +1099,7 @@ iframe {
         Runtime
       </span>
 
-      <strong
-        id="runtimeStatus"
-      >
+      <strong id="runtimeStatus">
         Ready
       </strong>
 
@@ -1576,9 +1111,7 @@ iframe {
         API requests
       </span>
 
-      <strong
-        id="apiCount"
-      >
+      <strong id="apiCount">
         0
       </strong>
 
@@ -1590,9 +1123,7 @@ iframe {
         WebSockets
       </span>
 
-      <strong
-        id="wsStatus"
-      >
+      <strong id="wsStatus">
         Ready
       </strong>
 
@@ -1604,9 +1135,7 @@ iframe {
         Speed
       </span>
 
-      <strong
-        id="gameSpeed"
-      >
+      <strong id="gameSpeed">
         —
       </strong>
 
@@ -1639,15 +1168,9 @@ const SERVERS = [
 ];
 
 
-/*
- * Add more later:
- *
- * {
- *   name: "US West",
- *   flag: "🇺🇸",
- *   url: "https://your-west.onrender.com"
- * }
- */
+/* =========================================================
+   STATE
+========================================================= */
 
 let selectedServer =
   SERVERS[0];
@@ -1659,6 +1182,9 @@ let activeTabId =
 
 let nextTabId =
   1;
+
+let apiRequests =
+  0;
 
 
 /* =========================================================
@@ -1705,39 +1231,34 @@ const statusEl =
     "status"
   );
 
-const serverButton =
-  document.getElementById(
-    "serverButton"
-  );
-
-const serverMenu =
-  document.getElementById(
-    "serverMenu"
-  );
-
-const serverList =
-  document.getElementById(
-    "serverList"
-  );
-
-const serverName =
+const serverNameEl =
   document.getElementById(
     "serverName"
   );
 
-const currentServer =
+const currentServerEl =
   document.getElementById(
     "currentServer"
   );
 
-const gameStatus =
+const serverMenuEl =
   document.getElementById(
-    "gameStatus"
+    "serverMenu"
+  );
+
+const serverListEl =
+  document.getElementById(
+    "serverList"
   );
 
 const gamePanel =
   document.getElementById(
     "gamePanel"
+  );
+
+const gameStatus =
+  document.getElementById(
+    "gameStatus"
   );
 
 const runtimeStatus =
@@ -1761,20 +1282,16 @@ const gameSpeed =
   );
 
 
-let apiRequests =
-  0;
-
-
 /* =========================================================
    SERVER UI
 ========================================================= */
 
 function updateServerUI() {
 
-  serverName.textContent =
+  serverNameEl.textContent =
     selectedServer.name;
 
-  currentServer.textContent =
+  currentServerEl.textContent =
     selectedServer.name;
 
 }
@@ -1782,7 +1299,7 @@ function updateServerUI() {
 
 function renderServers() {
 
-  serverList.innerHTML =
+  serverListEl.innerHTML =
     "";
 
   SERVERS.forEach(
@@ -1820,13 +1337,13 @@ function renderServers() {
 
           updateServerUI();
 
-          serverMenu.classList.remove(
+          serverMenuEl.classList.remove(
             "show"
           );
 
         };
 
-      serverList.appendChild(
+      serverListEl.appendChild(
         button
       );
 
@@ -1878,9 +1395,9 @@ function homeHTML() {
         <p class="subtitle">
 
           Game Mode is active.
-          FastProxy rewrites game networking,
-          supports API traffic and WebSockets,
-          and caches smaller game resources.
+          Browse websites with tabs,
+          smart caching and proxy
+          networking.
 
         </p>
 
@@ -1888,14 +1405,12 @@ function homeHTML() {
 
           <input
             class="home-input"
-            placeholder="Enter a game website..."
+            placeholder="Enter a website..."
             autocomplete="off"
             spellcheck="false"
           >
 
-          <button
-            class="home-go"
-          >
+          <button class="home-go">
             Launch →
           </button>
 
@@ -2015,7 +1530,6 @@ function createTab() {
   page.className =
     "page";
 
-
   page.innerHTML =
     homeHTML();
 
@@ -2049,7 +1563,9 @@ function createTab() {
   };
 
 
-  tabs.push(tab);
+  tabs.push(
+    tab
+  );
 
   activeTabId =
     id;
@@ -2088,11 +1604,11 @@ function getActiveTab() {
 ========================================================= */
 
 function navigate(
-  raw
+  rawUrl
 ) {
 
   let url =
-    raw.trim();
+    rawUrl.trim();
 
 
   if (!url) {
@@ -2139,25 +1655,20 @@ function navigate(
   }
 
 
-  loadingEl.classList.add(
-    "show"
+  showLoading(
+    url
   );
-
-
-  loadingUrlEl.textContent =
-    url;
-
-
-  statusEl.textContent =
-    "Connecting";
-
-
-  speedEl.textContent =
-    "Loading";
 
 
   const start =
     performance.now();
+
+
+  apiRequests =
+    0;
+
+  apiCount.textContent =
+    "0";
 
 
   const iframe =
@@ -2193,11 +1704,10 @@ function navigate(
         elapsed < 1000
           ? Math.round(
               elapsed
-            ) +
-            " ms"
-          :
-            (
-              elapsed / 1000
+            ) + " ms"
+          : (
+              elapsed /
+              1000
             ).toFixed(2) +
             " s";
 
@@ -2270,9 +1780,8 @@ function navigate(
 
 
   /*
-   * History
+   * Add to history.
    */
-
   tab.history =
     tab.history.slice(
       0,
@@ -2299,7 +1808,31 @@ function navigate(
 
 
 /* =========================================================
-   TAB RENDER
+   LOADING
+========================================================= */
+
+function showLoading(
+  url
+) {
+
+  loadingUrlEl.textContent =
+    url;
+
+  loadingEl.classList.add(
+    "show"
+  );
+
+  statusEl.textContent =
+    "Loading";
+
+  speedEl.textContent =
+    "Loading...";
+
+}
+
+
+/* =========================================================
+   TABS
 ========================================================= */
 
 function renderTabs() {
@@ -2372,13 +1905,10 @@ function renderTabs() {
 
 
       item.onclick =
-        () => {
-
+        () =>
           switchTab(
             tab.id
           );
-
-        };
 
 
       tabsEl.appendChild(
@@ -2402,7 +1932,8 @@ function renderTabs() {
 
 
   plus.onclick =
-    createTab;
+    () =>
+      createTab();
 
 
   tabsEl.appendChild(
@@ -2460,10 +1991,6 @@ function switchTab(
     statusEl.textContent =
       "Home";
 
-    gamePanel.classList.remove(
-      "show"
-    );
-
   }
 
 }
@@ -2489,7 +2016,11 @@ function closeTab(
   }
 
 
+  /*
+   * Destroy the tab.
+   */
   tabs[index].page.remove();
+
 
   tabs.splice(
     index,
@@ -2535,7 +2066,133 @@ function closeTab(
 
 
 /* =========================================================
-   ADDRESS BAR
+   DEACTIVATION
+========================================================= */
+
+function deactivateCurrentTab() {
+
+  const tab =
+    getActiveTab();
+
+
+  if (!tab) {
+    return;
+  }
+
+
+  /*
+   * Remove the current website
+   * from the page.
+   */
+  if (tab.page) {
+    tab.page.remove();
+  }
+
+
+  /*
+   * Destroy all tab data.
+   */
+  tab.url =
+    null;
+
+  tab.history =
+    [];
+
+  tab.historyIndex =
+    -1;
+
+  tab.iframe =
+    null;
+
+
+  /*
+   * Remove tab completely.
+   */
+  const index =
+    tabs.findIndex(
+      t =>
+        t.id ===
+        tab.id
+    );
+
+
+  if (index !== -1) {
+
+    tabs.splice(
+      index,
+      1
+    );
+
+  }
+
+
+  activeTabId =
+    null;
+
+
+  /*
+   * Reset UI.
+   */
+  loadingEl.classList.remove(
+    "show"
+  );
+
+  speedEl.textContent =
+    "—";
+
+  cacheEl.textContent =
+    "Cleared";
+
+  statusEl.textContent =
+    "Deactivated";
+
+  gameStatus.textContent =
+    "OFF";
+
+  runtimeStatus.textContent =
+    "Stopped";
+
+  apiRequests =
+    0;
+
+  apiCount.textContent =
+    "0";
+
+  wsStatus.textContent =
+    "Stopped";
+
+  gameSpeed.textContent =
+    "—";
+
+  gamePanel.classList.remove(
+    "show"
+  );
+
+
+  /*
+   * Open a fresh New Tab.
+   */
+  createTab();
+
+}
+
+
+/* =========================================================
+   DEACTIVATION BUTTON
+========================================================= */
+
+document.getElementById(
+  "deactivate"
+).onclick =
+  () => {
+
+    deactivateCurrentTab();
+
+  };
+
+
+/* =========================================================
+   ADDRESS
 ========================================================= */
 
 function updateAddress() {
@@ -2553,7 +2210,7 @@ function updateAddress() {
 
 
 /* =========================================================
-   HISTORY
+   NAVIGATION
 ========================================================= */
 
 function updateNavigation() {
@@ -2577,7 +2234,7 @@ function updateNavigation() {
     "forward"
   ).disabled =
     tab.historyIndex >=
-      tab.history.length - 1;
+    tab.history.length - 1;
 
 }
 
@@ -2602,10 +2259,15 @@ document.getElementById(
     tab.historyIndex--;
 
 
-    navigate(
+    const url =
       tab.history[
         tab.historyIndex
-      ]
+      ];
+
+
+    loadHistory(
+      tab,
+      url
     );
 
   };
@@ -2632,13 +2294,114 @@ document.getElementById(
     tab.historyIndex++;
 
 
-    navigate(
+    const url =
       tab.history[
         tab.historyIndex
-      ]
+      ];
+
+
+    loadHistory(
+      tab,
+      url
     );
 
   };
+
+
+function loadHistory(
+  tab,
+  url
+) {
+
+  showLoading(
+    url
+  );
+
+
+  const start =
+    performance.now();
+
+
+  const iframe =
+    document.createElement(
+      "iframe"
+    );
+
+
+  iframe.src =
+    buildProxyUrl(
+      url
+    );
+
+
+  iframe.allow =
+    "autoplay; fullscreen; gamepad; microphone; camera; clipboard-read; clipboard-write";
+
+
+  iframe.allowFullscreen =
+    true;
+
+
+  iframe.addEventListener(
+    "load",
+    () => {
+
+      const elapsed =
+        performance.now() -
+        start;
+
+
+      speedEl.textContent =
+        elapsed < 1000
+          ? Math.round(
+              elapsed
+            ) + " ms"
+          : (
+              elapsed /
+              1000
+            ).toFixed(2) +
+            " s";
+
+
+      loadingEl.classList.remove(
+        "show"
+      );
+
+
+      statusEl.textContent =
+        "Loaded";
+
+    }
+  );
+
+
+  tab.page.innerHTML =
+    "";
+
+  tab.page.appendChild(
+    iframe
+  );
+
+
+  tab.iframe =
+    iframe;
+
+  tab.url =
+    url;
+
+  tab.title =
+    getDomain(
+      url
+    );
+
+
+  updateAddress();
+
+  updateNavigation();
+
+  renderTabs();
+
+}
 
 
 /* =========================================================
@@ -2659,7 +2422,8 @@ document.getElementById(
       tab.url
     ) {
 
-      navigate(
+      loadHistory(
+        tab,
         tab.url
       );
 
@@ -2726,6 +2490,9 @@ document.getElementById(
     statusEl.textContent =
       "Home";
 
+    gameStatus.textContent =
+      "ON";
+
     gamePanel.classList.remove(
       "show"
     );
@@ -2734,7 +2501,7 @@ document.getElementById(
 
 
 /* =========================================================
-   ADDRESS ENTER
+   ADDRESS BAR
 ========================================================= */
 
 document.getElementById(
@@ -2793,13 +2560,10 @@ function attachHomeEvents(
   ) {
 
     button.onclick =
-      () => {
-
+      () =>
         navigate(
           input.value
         );
-
-      };
 
 
     input.addEventListener(
@@ -2831,13 +2595,10 @@ function attachHomeEvents(
       card => {
 
         card.onclick =
-          () => {
-
+          () =>
             navigate(
               card.dataset.url
             );
-
-          };
 
       }
     );
@@ -2883,14 +2644,10 @@ window.addEventListener(
 
 
     if (
-      data.type ===
-      "fetch" ||
-      data.type ===
-      "xhr" ||
-      data.type ===
-      "request" ||
-      data.type ===
-      "beacon"
+      data.type === "fetch" ||
+      data.type === "xhr" ||
+      data.type === "request" ||
+      data.type === "beacon"
     ) {
 
       apiRequests++;
@@ -2908,6 +2665,7 @@ window.addEventListener(
 
       wsStatus.textContent =
         "Connecting";
+
 
       setTimeout(
         () => {
@@ -2929,10 +2687,14 @@ window.addEventListener(
    SERVER MENU
 ========================================================= */
 
-serverButton.onclick =
-  () => {
+document.getElementById(
+  "serverButton"
+).onclick =
+  event => {
 
-    serverMenu.classList.toggle(
+    event.stopPropagation();
+
+    serverMenuEl.classList.toggle(
       "show"
     );
 
@@ -2944,15 +2706,17 @@ document.addEventListener(
   event => {
 
     if (
-      !serverMenu.contains(
+      !serverMenuEl.contains(
         event.target
       ) &&
-      !serverButton.contains(
+      !document.getElementById(
+        "serverButton"
+      ).contains(
         event.target
       )
     ) {
 
-      serverMenu.classList.remove(
+      serverMenuEl.classList.remove(
         "show"
       );
 
@@ -3019,7 +2783,7 @@ themeButton.onclick =
 
 
 /* =========================================================
-   GAME PANEL
+   GAME PANEL CLOSE
 ========================================================= */
 
 document.getElementById(
@@ -3073,5 +2837,4 @@ createTab();
 </script>
 
 </body>
-
 </html>
